@@ -74,6 +74,21 @@
 
 
 
+function getSessionId(){
+session_id();
+	session_regenerate_id();
+}
+
+function sanitizeString($var){
+	global $db;
+	$var = strip_tags($var);
+	$var = htmlentities($var);
+	$var = stripslashes($var);
+	$var = filter_var($var, FILTER_SANITIZE_STRING);
+	return $db->real_escape_string($var);
+}
+
+
 
 
 

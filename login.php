@@ -4,7 +4,7 @@
   require_once 'include/config.php';
 
   if (isset($_SESSION['adminId'])) {
-    Redirect('dasboard.php');
+    Redirect('dashboard.php');
   }
 
   if (isset($_POST['submit'])) {
@@ -23,7 +23,7 @@
         if ($_SESSION['trackingUrl']) {
           Redirect($_SESSION['trackingUrl']);
         }else{
-          Redirect('dasboard.php');
+          Redirect('dashboard.php');
         }
       }else{
         $_SESSION["errorMessage"] = "Username or password is not correct";

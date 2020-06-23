@@ -2,7 +2,7 @@
   require_once 'include/config.php';
   require_once 'include/session.php';
   require_once 'include/functions.php';
-  confirmLogin()
+  confirmLogin();
   /*$sql = "SELECT * FROM posts WHERE id='$id'";
   $connect = $db->query($sql);
   foreach ($connect as $row) {
@@ -82,46 +82,7 @@
   </head>
   <body>
     <header class="container-fluid bg-dark">
-      <nav class="navbar navbar-dark navbar-expand-md container ">
-        <!-- Brand -->
-        <a class="navbar-brand" href="#">Logo</a>
-        
-        <button class="navbar-toggler  navbar-light" data-toggle="collapse" data-target="#collapsibleNavbar">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-   
-        <!-- Navbar links -->
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul class="navbar-nav text-white mr-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="profile.php">My profile</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="dasboard.php">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="post.php">Posts</a>
-            </li> 
-            <li class="nav-item">
-              <a class="nav-link" href="categories.php">Categories</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="addAdmin.php">Manage Admins</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="comment.php">Comments</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="blog.php">Live Blog</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a href="logout.php" class="nav-link text-danger"><i class=" fas fa-sign-out-alt"></i>Logout</a>
-            </li>
-          </ul>
-        </div>
-      </nav>
+      <?php require 'template/nav.php'; ?>
       <div class="row bg-primary" style="height: 3.5px"></div>
       <div class="container text-white">
         <div class="row">
