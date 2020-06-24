@@ -19,6 +19,9 @@
         $_SESSION["adminName"] = $accountValid['adminName'];
         $_SESSION["username"] = $accountValid['username'];
         $_SESSION["adminId"] = $accountValid['id'];
+        $_SESSION["about"] = $accountValid['about'];
+        $_SESSION["headline"] = $accountValid['headline'];
+        $_SESSION["about"] = $accountValid['image'];
         $_SESSION["successMessage"] = "Welcome ".$_SESSION["adminName"];
         if ($_SESSION['trackingUrl']) {
           Redirect($_SESSION['trackingUrl']);
@@ -60,11 +63,6 @@
         <!-- Brand -->
         <a class="navbar-brand" href="#">Logo</a>
         
-        <button class="navbar-toggler  navbar-light" data-toggle="collapse" data-target="#collapsibleNavbar">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-   
-       
       </nav>
       <div class="row bg-primary" style="height: 3.5px"></div>
     </header>
@@ -98,7 +96,10 @@
                     <div class="input-group-prepend">
                       <span class="bg-info text-white input-group-text"><i class="fas fa-lock"></i></span>
                     </div>
-                    <input class="form-control" type="password" name="password"  value="">
+                    <input class="form-control" id="password" type="password" name="password"  value="">
+                    <div class="input-group-append">
+                      <span class="bg-info text-white input-group-text" style="cursor: pointer;" id="lock" onclick="showPassword()"><i class="fas fa-eye"></i></span>
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -122,7 +123,19 @@
     </footer>
     
     
-    
+    <script type="text/javascript">
+      let lock = document.getElementById('lock');
+      let password = document.getElementById('password');
+
+      function showPassword() {
+        // console.log(password.type)
+        if (password.type == 'password') {
+          password.type = "text";
+        }else{
+          password.type = "password";
+        }
+      }
+    </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script type="text/javascript" src="js/jquery-3.3.1.slim.min.js"></script>

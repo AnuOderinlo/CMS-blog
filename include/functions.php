@@ -71,9 +71,6 @@
 	}
 
 
-
-
-
 function getSessionId(){
 session_id();
 	session_regenerate_id();

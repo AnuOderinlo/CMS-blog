@@ -72,7 +72,7 @@
             <img src="upload/<?php echo $image; ?>" class="img-fluid card-img-top" style="max-height: 350px">
             <div class="card-body">
               <h2 class="card-title"><?php echo $title ?></h2>
-              <small class="text-muted" >Written by <?php echo $author." on ".$date; ?></small>
+              <small class="text-muted" >Written by <a href="profile.php?author=<?php echo base64_encode($author) ?>"><?php echo $author; ?></a> <?php echo " on ".$date; ?></small>
               <span class="badge badge-info" style="float: right">comment <?php echo comment('ON', $id) ?></span>
               <hr>
               <p class="card-text">

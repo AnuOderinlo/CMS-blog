@@ -11,7 +11,7 @@
   <div class="collapse navbar-collapse" id="collapsibleNavbar">
     <ul class="navbar-nav text-white mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="profile.php">My profile</a>
+        <a class="nav-link" href="myProfile.php">My profile</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="dashboard.php">Dashboard</a>

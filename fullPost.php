@@ -113,7 +113,6 @@
             <div class="card-body">
               <h2 class="card-title"><?php echo $title ?></h2>
               <small class="text-muted" >Written by <?php echo $author." on ".$date; ?></small>
-              <span class="badge badge-info" style="float: right">comment 14</span>
               <hr>
               <p class="card-text">
                 <?php 
