@@ -1,0 +1,33 @@
+main, aside {
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  main, aside {
+    width: 50%;
+  }
+}
+
+aside {
+  background-image: url(../images/profile_big.jpg);
+  background-position: center center;
+  background-size: cover;
+  height: 400px;
+  position: relative;
+}
+
+@media (min-width: 576px) {
+  aside {
+    height: 100vh;
+    width: 100%
+    /*position: fixed;*/
+    /*right: 0;*/
+    /*top: 0;*/
+  }
+}
+
+/*main {
+  float: left;
+  padding: 7%;
+  position: relative;
+}*/

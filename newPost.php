@@ -9,6 +9,7 @@
     date_default_timezone_set("Africa/Lagos");
     $today = date("d/M/Y h:ia", time());
     // var_dump($today);
+    $adminId = $_SESSION["adminId"];
     $author = $_SESSION["adminName"];
     $postTitle = trim($_POST["postTitle"]);
     $categorySelected = $_POST['category'];
@@ -35,7 +36,8 @@
       }
     }*/else{
       move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
-      $sql = sprintf("INSERT INTO posts (date, author, title, category, image, post) VALUES ('%s','%s','%s','%s','%s','%s')",
+      $sql = sprintf("INSERT INTO posts (admin_id, date, author, title, category, image, post) VALUES ('%s','%s','%s','%s','%s','%s','%s')",
+          $adminId,
           $db->real_escape_string($today),
           $db->real_escape_string($author),
           $db->real_escape_string($postTitle),
@@ -60,7 +62,7 @@
  ?>
 
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <!-- Required meta tags -->

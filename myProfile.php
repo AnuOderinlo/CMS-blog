@@ -24,9 +24,9 @@
     echo "It didnt connect";
   }
 
-
   // updating the admin
   if (isset($_POST["submit"])) {
+
     date_default_timezone_set("Africa/Lagos");
     $today = date("d/M/Y h:ia", time());
     // var_dump($today);
@@ -37,6 +37,7 @@
     $imageName = $_FILES['image']['name'];
     $imageStored = "images/".basename("$imageName");
     
+   
     // var_dump($_FILES);
     if (empty($name) && empty($headline) && empty($imageName) && empty($about)) {
       $_SESSION["errorMessage"] = "No field to update!";
@@ -50,6 +51,8 @@
       Redirect("myProfile.php");
     }else{
       move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
+
+
 
       if (!empty($imageName)) {
         if ($image !== "myAvatar.png") {
@@ -67,11 +70,15 @@
             $db->real_escape_string($headline),
             $db->real_escape_string($about)
         );
+
+        $sql2 = "UPDATE posts SET author='$name' WHERE admin_id='$adminid'";
+
       }
       
-      // var_dump($sql);
+      var_dump($sql);
       $connect = $db->query($sql);
-      if ($connect) {
+      $connect2 = $db->query($sql2);
+      if ($connect && $connect2) {
         $_SESSION["successMessage"] = "Successfully updated your profile";
         Redirect("myProfile.php");
       }else{
@@ -82,7 +89,7 @@
   }
   
  ?>
-
+  
 
 <!doctype html>
 <html lang="en">
@@ -142,12 +149,12 @@
                 <div class="form-group">
                   <label class="form-check-label">Full name: </label>
                   <small class="text-muted">e.g John Doe</small>
-                  <input type="text" class="form-control" name="name" placeholder="Full name please">
+                  <input type="text" class="form-control" name="name" value="<?php echo $adminName ?> " placeholder="Full name please">
                 </div>
                 <div class="form-group">
                   <label for="select-category">What you do: </label>
                   <small class="text-muted">e.g Blogger, web developer etc.</small>
-                  <input type="text" class="form-control" name="headline" placeholder="What you do">
+                  <input type="text" class="form-control" name="headline" value="<?php echo $headline ?>"  placeholder="What you do">
                 </div>
                 <span class="text-danger">Image size must be less than 2MB</span>
                 <div class="custom-file mb-2">
@@ -156,7 +163,7 @@
                 </div>
                 <div class="form-group purple-border">
                   <label for="post">About:</label>
-                  <textarea name="about" class="form-control" id="post" rows="7"></textarea>
+                  <textarea name="about" class="form-control" id="post" rows="7"> <?php echo $about ?></textarea>
                 </div>
                 <div class="row">
                   <div class="col-6">

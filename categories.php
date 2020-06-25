@@ -127,7 +127,10 @@
               <td><?php echo $date; ?></td>
               <td><?php echo $creator ?></td>
               <td><?php echo $category?></td>
-              <td><a href="deleteCategory.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
+              <td class="text-center">
+                <a href="deleteCategory.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">
+                  <i class=" far fa-trash-alt"></i>
+                </a>
               </td>
               
             </tr>

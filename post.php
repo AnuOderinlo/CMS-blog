@@ -122,8 +122,8 @@
               </span>
             </td>
             <td>
-              <a href="editPost.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-primary">edit</a>
-              <a href="deletePost.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">delete</a>
+              <a href="editPost.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+              <a href="deletePost.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger"><i class="far fa-trash-alt"></i></a>
             </td>
             <td>
               <a target="_blank" href="fullPost.php?id=<?php echo $row['id'] ?>"  class="btn btn-sm btn-info">live preview</a>

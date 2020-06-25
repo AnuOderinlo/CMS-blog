@@ -126,9 +126,9 @@
             <td><?php echo $date; ?></td>
             <td><?php echo $name ?></td>
             <td><?php echo $comment?></td>
-            <td><a href="unapproveComment.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-warning">Disapprove</a></td>
+            <td><a href="unapproveComment.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-thumbs-down"></i></a></td>
             <td>
-              <a href="deleteComment.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
+              <a href="deleteComment.php?id=<?php echo $row['id'] ?>" class="text-white btn btn-sm btn-danger"><i class=" far fa-trash-alt"></i></a>
             </td>
             <td>
               <a target="_blank" href="fullpost.php?id=<?php echo $row['post_id'] ?>"  class="btn btn-sm btn-info">live preview</a>
