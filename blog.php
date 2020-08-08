@@ -27,8 +27,8 @@
     <section class="container">
       <div class="row">
         <div class="col-md-8">
-          <h1>The complete Responsive CMS blog</h1>
-          <h1 class="lead">The complete Blog by using PHP by Anuoluwapo Oderinlo</h1>
+          <!-- <h1>The complete Responsive CMS blog</h1> -->
+          <!-- <h1 class="lead">The complete Blog by using PHP by Anuoluwapo Oderinlo</h1> -->
           <?php 
               echo errorMessage(); 
               echo successMessage(); 
@@ -73,7 +73,7 @@
             <div class="card-body">
               <h2 class="card-title"><?php echo $title ?></h2>
               <small class="text-muted" >Written by <a href="profile.php?author=<?php echo base64_encode($author) ?>"><?php echo $author; ?></a> <?php echo " on ".$date; ?></small>
-              <span class="badge badge-info" style="float: right">comment <?php echo comment('ON', $id) ?></span>
+              <span class="badge badge-info" style="float: right">comment <?php echo comment($id) ?></span>
               <hr>
               <p class="card-text">
                 <?php 

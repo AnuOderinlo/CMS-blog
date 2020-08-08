@@ -6,6 +6,8 @@
   if (isset($_GET['author'])) {
     $author = $_GET['author'];
     $author = base64_decode($author);
+  }else{
+    Redirect("blog.php");
   }
   $sql = "SELECT * FROM  admins WHERE adminName='$author'";
   $connect = $db->query($sql);
@@ -18,6 +20,8 @@
       $username = $row['username'];
       $about = $row['about'];
       $image = $row['image'];
+      $adminAry = explode(" ",$adminName);
+      $firstname = $adminAry[0];
 
       // echo $adminName;
     }
@@ -43,7 +47,7 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <link rel="stylesheet" type="text/css" href="css/css/all.css">
 
-    <title>Blog</title>
+    <title>Profile</title>
   </head>
   <body>
     <?php require 'template/header.php'; ?>
@@ -70,12 +74,13 @@
             <a href="#" class="mr-2 mb-2">Instagram</a> 
           </p> 
         </main>
+
         <!-- side bar starts here -->
         <div class="col-md-3">
           <!-- recent post starts here -->
           <div class="card mb-5">
             <div class="card-header bg-dark text-white">
-              <h5>Recent Posts by <?php echo $adminName; ?></h5>
+              <h5>Recent Posts by <?php echo $firstname; ?></h5>
             </div>
             <div class="card-body">
           <?php 

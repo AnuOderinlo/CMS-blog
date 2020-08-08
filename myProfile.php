@@ -31,9 +31,9 @@
     $today = date("d/M/Y h:ia", time());
     // var_dump($today);
     $author = $_SESSION["adminName"];
-    $name= $_POST['name'];
-    $headline = trim($_POST["headline"]);
-    $about= $_POST['about'];
+    $name= sanitizeString($_POST['name']);
+    $headline = sanitizeString($_POST["headline"]);
+    $about= sanitizeString($_POST['about']);
     $imageName = $_FILES['image']['name'];
     $imageStored = "images/".basename("$imageName");
     
@@ -53,31 +53,29 @@
       move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
 
 
-
       if (!empty($imageName)) {
         if ($image !== "myAvatar.png") {
           unlink("images/".$image);
         }
-        $sql = sprintf("UPDATE admins SET adminName='%s', headline='%s', image='%s', about='%s' WHERE id='$adminid'",
-            $db->real_escape_string($name),
-            $db->real_escape_string($headline),
-            $db->real_escape_string($imageName),
-            $db->real_escape_string($about)
-        );
+        $sql = "UPDATE admins SET adminName=?, headline=?, image=?, about=? WHERE id='$adminid'";
+        $connect = $db->prepare($sql);
+        $connect->bind_param("ssss", $name, $headline, $imageName, $about);
       }else{
-        $sql = sprintf("UPDATE admins SET adminName='%s', headline='%s', about='%s' WHERE id='$adminid'",
-            $db->real_escape_string($name),
-            $db->real_escape_string($headline),
-            $db->real_escape_string($about)
-        );
-
-        $sql2 = "UPDATE posts SET author='$name' WHERE admin_id='$adminid'";
+        $sql = "UPDATE admins SET adminName=?, headline=?, about=? WHERE id='$adminid'";
+        $connect = $db->prepare($sql);
+        $connect->bind_param("sss", $name, $headline, $about);
+        $connect->execute();
+        // update the post table too
+        $sql2 = "UPDATE posts SET author=? WHERE admin_id=?";
+        $connect2 = $db->prepare($sql2);
+        $connect2->bind_param("si", $name, $adminid);  
+        $connect2->execute();
 
       }
       
-      var_dump($sql);
-      $connect = $db->query($sql);
-      $connect2 = $db->query($sql2);
+      // var_dump($sql);
+      // $connect = $db->query($sql);
+      // $connect2 = $db->query($sql2);
       if ($connect && $connect2) {
         $_SESSION["successMessage"] = "Successfully updated your profile";
         Redirect("myProfile.php");

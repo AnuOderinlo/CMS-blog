@@ -61,10 +61,10 @@
 	}
 
 	// This fucntions returns total number of rows depending on the status
-	function comment($status, $id)
+	function comment($id)
 	{	
 		global $db;
-		$sql2 = "SELECT * FROM comments WHERE status= '$status' AND post_id='$id' ";
+		$sql2 = "SELECT * FROM comments WHERE  post_id='$id' ";
 		$connect2 = $db->query($sql2);
 		$totalRow = mysqli_num_rows($connect2);
 		return $totalRow;
@@ -76,15 +76,36 @@ session_id();
 	session_regenerate_id();
 }
 
+// serialize input
 function sanitizeString($var){
 	global $db;
 	$var = strip_tags($var);
 	$var = htmlentities($var);
 	$var = stripslashes($var);
 	$var = filter_var($var, FILTER_SANITIZE_STRING);
-	return $db->real_escape_string($var);
+	return $db->real_escape_string(trim($var));
 }
 
+// Validate user input
+function validator($data)
+{
+	// validate EMAIL
+	if (filter_var($data, FILTER_VALIDATE_EMAIL)) {
+		if (preg_match("/[a-zA-Z0-9_.]{3,}@[a-zA-Z]{4,}[.]{1}[a-zA-Z0-9.]{2,}/", $data)) {
+			return $data;
+		}
+	}
+	// validate PHONE NUMBER
+	if (filter_var($data, FILTER_SANITIZE_NUMBER_INT)) {
+		return $data;
+	}
+	// validate URL
+	if (filter_var($data, FILTER_VALIDATE_URL)) {
+		if (preg_match("/(https:|ftp:)\/\/+[a-zA-Z.0-9\?&\%\$\-\#]+\.[a-zA-Z.0-9\?&\%\$\-\#\/\_]*/", $data)) {
+			return $data;
+		}
+	}
+}
 
 
 

@@ -1,10 +1,5 @@
 <?php 
-  require_once 'fullPostProcessing.php';
-  // require_once 'fetchComment.php';
-   if (isset($_GET['id'])) {
-    $idUrl = $_GET['id'];
-  }
- /* require_once 'include/session.php';
+  require_once 'include/session.php';
   require_once 'include/functions.php';
   require_once 'include/config.php';
   // echo $_POST["commentName"];
@@ -47,7 +42,7 @@
       }
     }
   }
-*/
+
 ?>
 
 
@@ -128,67 +123,43 @@
           <!-- commented post starts here -->
           
           <h6 class="display-5 text-primary">Comment</h6>
-          <div id="comment" >
-            <input id="id" type="hidden" name="id" value="<?php echo $idUrl ?>">
-            <script type="text/javascript">
+          <?php 
 
-              $(document).ready(function () {
-                var max = false;
-                var start = 0;
-                var limit = 5;
-                // let btn = ;
-                // $("#btn").on("click", getComment);
-                // console.log($("#id").val());
+          /* this php part returns the available comments on a particular post of ID*/
 
-                // $("#btn").on("click", getComment);
-                function getComment() {
-                  if (max)
-                    return;
-                  $.ajax({
-                    url: "fetchComment.php",
-                    method: "POST",
-                    dataType: "text",
-                    data: {
-                      getData: 1,//what is this line for?
-                      start: start,
-                      limit: limit,
-                      id: $("#id").val()
-                    },
-                    success: function (data) {
-                      if (data==max || data==0) {
-                        max= true;
-                      }else{
-                        $('#comment').append(data);
-                        start += limit;
-                      }
-                    }
-                  })
-                }
+            $sql = "SELECT * FROM comments WHERE post_id='$idUrl' ORDER BY id asc";
+            $connect = $db->query($sql);
+            // if ($connect) {
+              while ($row = $connect->fetch_assoc()) {
+                $nameCommenter = $row['name'];
+                $comment = $row['comment'];
+                $date = $row['date'];
+          ?>
 
-                getComment()
-
-                $("#btn").on("click", getComment);
-              })
-
-              // $(document).ready(function () {
-              // })   
-            </script>
+          <div class="media border mt-3 p-3 mb-2">
+            <div class="row">
+              <div class="col-12 col-md-3">
+                <img src="images/myAvatar.png" class="rounded-circle img-fluid img-25">
+              </div>
+              <div class="col-12 col-md-9">
+                <div class="media-body ">
+                  <h4><?php echo $nameCommenter; ?></h4>
+                  <small>Posted on <?php echo $date; ?></small>
+                  <p class=""><?php echo $comment; ?></p>
+                </div>
+              </div>
+            </div>
             
           </div>
-          <div>
-            <button id="btn" class="btn btn-primary">More comment</button>
-          </div>
 
-          <!-- <div id="comment" ></div> -->
-
-          
-          <!-- commented post ends here -->
-          <?php /*echo errorMessage(); 
-                echo successMessage(); */
+          <?php } ?>
+          <!-- commented post starts here -->
+          <?php echo errorMessage(); 
+                echo successMessage(); 
           ?>
-          <div id="errorMsg"></div>
+          <!-- <div id="note"></div> -->
           <div class="mt-3">
-            <form id="form" class="commentForm" action="fullPostProcessing.php" method="post">
+            <form id="form" action="fullPostProcessing.php" method="post">
               <input type="hidden" name="id" value="<?php echo $idUrl ?>">
               <div class="card mb-3">
                 <div class="card-header">
@@ -200,7 +171,7 @@
                       <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                       </div>
-                      <input id="name" class="form-control" type="text" name="commentName" placeholder="Name" value="">
+                      <input class="form-control" type="text" name="commentName" placeholder="Name" value="">
                     </div>
                   </div>
                   <div class="form-group">
@@ -208,11 +179,11 @@
                       <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                       </div>
-                      <input id="email" class="form-control" type="email" name="commentEmail" placeholder="Email" value="">
+                      <input class="form-control" type="email" name="commentEmail" placeholder="Email" value="">
                     </div>
                   </div>
                   <div class="form-group">
-                    <textarea id="commentText" name="commentText" class="form-control" rows="6"></textarea>
+                    <textarea name="commentText" class="form-control" rows="6"></textarea>
                   </div>
                   <div>
                     <input type="hidden" name="submit">
@@ -249,7 +220,6 @@
       $(document).ready(function() {
         $("#form").on("submit", function (e) {
           e.preventDefault();
-          // $(".errorMsg").hide();
           $.ajax({
             url:"fullPostProcessing.php",
             method:"POST",
@@ -257,21 +227,7 @@
             contentType: false,
             processData: false,
             success:function(data){
-              if (data == "Field can't be empty" || data == "Maximum characters reach(500 characters)" || data == "Invalid Email" || data== "Couldn't comment, something went wrong") {
-                $("#errorMsg").html(`<div  id="error" class="alert alert-danger ">${data}</div>`);
-                // $("#form")[0].reset()
-                console.log(data);
-                // $("#errorMsg").show();
-              }else{
-                // console.log(typeof data);
-                // $("#errorMsg").html(`<div  id="error" class="alert alert-success">${data}</div>`);
-                
-
-                $("#comment").append(data);
-                $("#form")[0].reset()
-                // $("div#errorMsg").hide();
-
-              }
+             $("#note").html(data);
             }
           })
         })
@@ -291,11 +247,3 @@
     
   </body>
 </html>
-
-
-
-<!-- Questions to ask Tosin -->
-<!-- 
-  1. How do I immediately append a comment after submit 
-  2. 
--->

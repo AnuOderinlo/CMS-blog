@@ -57,7 +57,7 @@
         <div class="col-md-6 offset-md-3">
           <form class="registerationForm" action="" method="post">
 
-             <input type="hidden" value="<?php echo $token; ?>" name="token">
+            <input type="hidden" value="<?php echo $token; ?>" name="token">
             <div class="card mb-3">
               <div class="card-header bg-secondary text-white">
                 <h5 class="text-white errorMsg">Good to see you again!</h5>
@@ -103,7 +103,7 @@
                   </div>
                 </div>
                 <div>
-                   <input type="hidden" name="submit">
+                  <input type="hidden" name="submit">
                   <button type="submit" class="btn btn-info btn-block" name="submit">Register</button>
                 </div>
               </div>

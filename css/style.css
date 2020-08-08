@@ -9,7 +9,7 @@ main, aside {
 }
 
 aside {
-  background-image: url(../images/profile_big.jpg);
+  
   background-position: center center;
   background-size: cover;
   height: 400px;

@@ -11,16 +11,16 @@
     // var_dump($today);
     $adminId = $_SESSION["adminId"];
     $author = $_SESSION["adminName"];
-    $postTitle = trim($_POST["postTitle"]);
+    $postTitle = sanitizeString($_POST["postTitle"]);
     $categorySelected = $_POST['category'];
     $imageName = $_FILES['image']['name'];
     $imageStored = "upload/".basename($imageName);
-    $postContent = $_POST['postContent'];
+    $postContent = sanitizeString($_POST['postContent']);
     // var_dump($_FILES);
     if (empty($postTitle)) {
       $_SESSION["errorMessage"] = "Post title can't be empty";
       Redirect("newPost.php");
-    }elseif (strlen($postTitle)< 5) {
+    }elseif (strlen($postTitle) < 5) {
       $_SESSION["errorMessage"] = "Post title characters can not be less than 5";
       Redirect("newPost.php");
     }elseif (strlen($postContent) > 999) {
@@ -36,23 +36,14 @@
       }
     }*/else{
       move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
-      $sql = sprintf("INSERT INTO posts (admin_id, date, author, title, category, image, post) VALUES ('%s','%s','%s','%s','%s','%s','%s')",
-          $adminId,
-          $db->real_escape_string($today),
-          $db->real_escape_string($author),
-          $db->real_escape_string($postTitle),
-          $db->real_escape_string($categorySelected),
-          $db->real_escape_string($imageName),
-          $db->real_escape_string($postContent)
-      );
-      // var_dump($sql);
-      $connect = $db->query($sql);
-      if ($connect) {
-        // var_dump($connect);
+      $sql ="INSERT INTO posts (admin_id, date, author, title, category, image, post) VALUES (?,?,?,?,?,?,?)";
+
+      $connect = $db->prepare($sql);
+      $connect->bind_param("sssssss", $adminId, $today, $author, $postTitle, $categorySelected, $imageName, $postContent);
+      if ($connect->execute()) {
         $_SESSION["successMessage"] = "Successfully added a post";
         Redirect("newPost.php");
       }else{
-        echo "Not working";
         $_SESSION["errorMessage"] = "Couldn't post, something went wrong";
         Redirect("newPost.php");
       }
@@ -113,15 +104,16 @@
                   <select class="form-control" name="category" id="select-category">
                     <?php 
                       $sql = "SELECT id, title FROM category";
-                      $connect = $db->query($sql);
+                      $connect = $db->prepare($sql);
 
-                      if ($connect) {
-                        foreach ($connect as $row) {
-                          $id = $row['id'];
-                          $title = $row['title'];
+                      if ($connect->execute()) {
+                        $connect->bind_result($id, $title);
+                        while ($connect->fetch()) {
                           echo "<option>".$title."</option>";
                         }
+                        $connect->close();
                       }
+                      $db->close();
                      ?>
                 
                   </select>

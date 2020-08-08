@@ -5,7 +5,7 @@
   $_SESSION['trackingUrl'] = $_SERVER['PHP_SELF'];
   confirmLogin();
   if (isset($_POST["submit"])) {
-    $category = trim($_POST["categoryTitle"]);
+    $category = sanitizeString($_POST["categoryTitle"]);
     date_default_timezone_set("Africa/Lagos");
     $date = date("d/M/Y h:ia", time());
     $author = $_SESSION["adminName"];
@@ -17,13 +17,10 @@
       Redirect("categories.php");
     }else{
 
-      $sql = sprintf("INSERT INTO category (title, author, date) VALUES ('%s','%s','%s')",
-          $db->real_escape_string($category),
-          $db->real_escape_string($author),
-          $db->real_escape_string($date)
-      );
-
-      $connect = $db->query($sql);
+      $sql = "INSERT INTO category (title, author, date) VALUES (?,?,?)";
+      $connect = $db->prepare($sql);
+      $connect->bind_param("sss", $category, $author, $date);
+      $connect = $connect->execute();
       if ($connect) {
         $_SESSION["successMessage"] = "Successfully added a category";
         Redirect("categories.php");
@@ -129,7 +126,7 @@
               <td><?php echo $category?></td>
               <td class="text-center">
                 <a href="deleteCategory.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">
-                  <i class=" far fa-trash-alt"></i>
+                  Delete <i class=" far fa-trash-alt"></i>
                 </a>
               </td>
               

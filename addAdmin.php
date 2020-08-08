@@ -8,10 +8,10 @@
     date_default_timezone_set("Africa/Lagos");
     $date = date("d/M/Y h:ia", time());
     $superAdmin = $_SESSION["adminName"];
-    $username = trim($_POST["username"]);
-    $name = trim($_POST["name"]);
-    $password = trim($_POST["password"]);
-    $confirmPassword = trim($_POST["confirmPassword"]);
+    $username = sanitizeString($_POST["username"]);
+    $name = sanitizeString($_POST["name"]);
+    $password = sanitizeString($_POST["password"]);
+    $confirmPassword = sanitizeString($_POST["confirmPassword"]);
 
     if (empty($username)||empty($password)||empty($confirmPassword)||empty($name)) {
       $_SESSION["errorMessage"] = "Field(s) can't be empty";
@@ -26,15 +26,11 @@
       $_SESSION["errorMessage"] = "Username already exist, use another one";
       Redirect("addAdmin.php");
     }else{
-      $sql = sprintf("INSERT INTO admins (date, username, adminName, password, superAdmin) VALUES ('%s','%s','%s','%s','%s')",
-          $db->real_escape_string($date),
-          $db->real_escape_string($username),
-          $db->real_escape_string($name),
-          $db->real_escape_string($password),
-          $db->real_escape_string($superAdmin)
-      );
+      $sql = "INSERT INTO admins (date, username, adminName, password, superAdmin) VALUES (?,?,?,?,?)";
+      $connect = $db->prepare($sql);
+      $connect->bind_param("sssss", $date, $username, $name, $password, $superAdmin);
+      $connect = $connect->execute();
 
-      $connect = $db->query($sql);
       if ($connect) {
         $_SESSION["successMessage"] = "Successfully created an admin";
         Redirect("addAdmin.php");
@@ -48,7 +44,7 @@
  ?>
 
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
@@ -155,7 +151,7 @@
               <td><?php echo $username ?></td>
               <td><?php echo $adminName?></td>
               <td><?php echo $addedBy?></td>
-              <td><a href="deleteAdmin.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
+              <td><a href="deleteAdmin.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">Delete <i class=" far fa-trash-alt"></i></a>
               </td>
               
             </tr>
