@@ -23,10 +23,12 @@
     }elseif (strlen($postTitle) < 5) {
       $_SESSION["errorMessage"] = "Post title characters can not be less than 5";
       Redirect("newPost.php");
-    }elseif (strlen($postContent) > 999) {
-      $_SESSION["errorMessage"] = "Maximum characters reach(1000 characters)";
-      Redirect("newPost.php");
-    }elseif (empty($imageName)) {
+    }
+    // elseif (strlen($postContent) > 999) {
+    //   $_SESSION["errorMessage"] = "Maximum characters reach(1000 characters)";
+    //   Redirect("newPost.php");
+    // }
+    elseif (empty($imageName)) {
       $_SESSION["errorMessage"] = "You need an image";
       Redirect("newPost.php");
     }/*elseif (isset($imageName)) {
@@ -65,6 +67,8 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <link rel="stylesheet" type="text/css" href="css/css/all.css">
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+      <script>tinymce.init({selector:'textarea'});</script>
 
     <title>Add Post</title>
   </head>
@@ -125,11 +129,11 @@
                 </div>
                 <div class="form-group purple-border">
                   <label for="post">Post</label>
-                  <textarea name="postContent" class="form-control" id="post" rows="7"></textarea>
+                  <textarea name="postContent" class="form-control" id="post" rows="20"></textarea>
                 </div>
                 <div class="row">
                   <div class="col-6">
-                    <a href="#" class="btn btn-secondary btn-block"><i class="fas fa-arrow-left"></i> Back to Dashboard </a>
+                    <a href="dashboard.php" class="btn btn-secondary btn-block"><i class="fas fa-arrow-left"></i> Back to Dashboard </a>
                   </div>
                   <div class="col-6">
                     <button  name="submit" class="btn btn-success btn-block"><i class="fas fa-check"></i> Publish</button>
@@ -142,23 +146,7 @@
       </div>
     </section>
 
-    <footer class="bg-dark text-white">
-      <div class="container">
-        <div class="row">
-          <div class="col">
-            <p>CMS theme built by | Anuoluwapo Oderinlo | &copy;<?php echo date("Y"); ?> All rights reserved</p>
-          </div>
-        </div>
-      </div>
-    </footer>
-    
-    
-    
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script type="text/javascript" src="js/jquery-3.3.1.slim.min.js"></script>
-    <script type="text/javascript" src="js/popper.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <?php require 'template/footer.php'; ?>
     
   </body>
 </html>

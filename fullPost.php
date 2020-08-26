@@ -141,6 +141,9 @@
                 // console.log($("#id").val());
 
                 // $("#btn").on("click", getComment);
+
+                 
+                
                 function getComment() {
                   if (max)
                     return;
@@ -157,17 +160,26 @@
                     success: function (data) {
                       if (data==max || data==0) {
                         max= true;
+                        $("#btn").hide();
+                        $(".loadingdiv").hide();
                       }else{
                         $('#comment').append(data);
                         start += limit;
+                         $(".loadingdiv").hide();
+
                       }
                     }
                   })
                 }
 
-                getComment()
 
-                $("#btn").on("click", getComment);
+
+               getComment();
+
+                $("#btn").on("click", function(){
+                  getComment();
+                   $(".loadingdiv").show();
+                });
               })
 
               // $(document).ready(function () {
@@ -176,7 +188,25 @@
             
           </div>
           <div>
-            <button id="btn" class="btn btn-primary">More comment</button>
+            <button id="btn" class="btn btn-primary">More comment</button> 
+            <div class="loadingdiv" style="display: none;"></div>
+            <style type="text/css">
+              .loadingdiv{
+                border: 3px solid #aaa !important;
+                border-top: 3px solid #000 !important;
+                border-radius: 50% !important;
+                width: 30px !important;
+                height: 30px !important;
+                animation: spin 1s linear infinite !important;
+              }
+
+              @keyframes spin{
+                0%{transform: rotate(0deg);
+                }
+                100%{transform: rotate(360deg);
+                }
+              }
+            </style>
           </div>
 
           <!-- <div id="comment" ></div> -->

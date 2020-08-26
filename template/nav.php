@@ -1,6 +1,15 @@
+<?php 
+
+  $admin_id= $_SESSION["adminId"];
+  $admin_status = $_SESSION["authority"];
+
+ ?>
+
+
+
 <nav class="navbar navbar-dark navbar-expand-md container ">
   <!-- Brand -->
-  <a class="navbar-brand" href="#">Logo</a>
+  <a class="navbar-brand" href="blog.php">i<i class="font-weight-bold" style="color: red">Blog.com</i></a>
   
   <button class="navbar-toggler  navbar-light" data-toggle="collapse" data-target="#collapsibleNavbar">
     <span class="navbar-toggler-icon"></span>
@@ -19,6 +28,10 @@
       <li class="nav-item">
         <a class="nav-link" href="post.php">Posts</a>
       </li> 
+      <?php 
+        if (check_super_admin()==$admin_status) {
+        
+       ?>
       <li class="nav-item">
         <a class="nav-link" href="categories.php">Categories</a>
       </li>
@@ -28,8 +41,9 @@
       <li class="nav-item">
         <a class="nav-link" href="comment.php">Comments</a>
       </li>
+      <?php } ?>
       <li class="nav-item">
-        <a class="nav-link" href="blog.php">Live Blog</a>
+        <a class="nav-link" href="blog.php" target="_balnk">Live Blog</a>
       </li>
     </ul>
     <ul class="navbar-nav">

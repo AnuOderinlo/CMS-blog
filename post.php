@@ -5,6 +5,9 @@
   // require_once 'deletePost.php';
   $_SESSION['trackingUrl'] = $_SERVER['PHP_SELF'];
   confirmLogin();  
+  $admin_id= $_SESSION["adminId"];
+  $admin_status = $_SESSION["authority"];
+  // $id= $_SESSION["id"];
  ?>
 
 
@@ -37,6 +40,10 @@
               <i class="fas fa-edit"></i> Add new Post
             </a>
           </div>
+          <?php 
+            if (check_super_admin()==$admin_status) {
+            
+           ?>
           <div class="col-md-3 col mb-2">
             <a href="categories.php" class="btn text-white btn-outline-secondary btn-block">
               <i class="fas fa-edit"></i> Add new category
@@ -52,7 +59,7 @@
               <i class="fas fa-check"></i> Approve comment
             </a>
           </div>
-          
+          <?php } ?>
         </div>
       </div>      
     </header>
@@ -80,7 +87,12 @@
           </thead>
           
           <?php 
-            $sql = "SELECT * FROM posts";
+            if (check_super_admin()==$admin_status) {
+              $sql = "SELECT * FROM posts";
+            }else{
+              $sql = "SELECT * FROM posts WHERE admin_id=$admin_id";
+            }
+           
             $connect = $db->query($sql);
 
             $sn = 0;
@@ -135,23 +147,7 @@
        </div>
     </section>
     
-    <footer class="bg-dark text-white">
-      <div class="container">
-        <div class="row">
-          <div class="col">
-            <p>CMS theme built by | Anuoluwapo Oderinlo | &copy;<?php echo date("Y"); ?> All rights reserved</p>
-          </div>
-        </div>
-      </div>
-    </footer>
-    
-    
-    
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script type="text/javascript" src="js/jquery-3.3.1.slim.min.js"></script>
-    <script type="text/javascript" src="js/popper.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <?php require 'template/footer.php'; ?>
     
   </body>
 </html>

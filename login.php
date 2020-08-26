@@ -22,6 +22,7 @@
         $_SESSION["about"] = $accountValid['about'];
         $_SESSION["headline"] = $accountValid['headline'];
         $_SESSION["about"] = $accountValid['image'];
+        $_SESSION["authority"] = $accountValid['authority'];
         $_SESSION["successMessage"] = "Welcome ".$_SESSION["adminName"];
         if ($_SESSION['trackingUrl']) {
           Redirect($_SESSION['trackingUrl']);
@@ -61,7 +62,7 @@
     <header class="container-fluid bg-dark mb-3">
       <nav class="navbar navbar-dark navbar-expand-md container ">
         <!-- Brand -->
-        <a class="navbar-brand" href="#">Logo</a>
+        <a class="navbar-brand" href="blog.php">i<i class="font-weight-bold" style="color: red">Blog.com</i></a>
         
       </nav>
       <div class="row bg-primary" style="height: 3.5px"></div>

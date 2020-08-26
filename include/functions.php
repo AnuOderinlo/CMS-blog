@@ -60,6 +60,18 @@
 		return $totalRow;
 	}
 
+	function totalRowPost($table)
+	{
+		global $db;
+		$sql = "SELECT * FROM $table WHERE admin_id=$admin_id";
+		$connect = $db->query($sql);
+
+		$totalRow = mysqli_num_rows($connect);
+		return $totalRow;
+	}
+
+
+
 	// This fucntions returns total number of rows depending on the status
 	function comment($id)
 	{	
@@ -107,6 +119,23 @@ function validator($data)
 	}
 }
 
+
+
+function check_super_admin(){
+	global $db;
+	$sql = "SELECT * FROM admins";
+	$connect = $db->query($sql);
+	while ( $row = $connect->fetch_assoc()) {
+		$admin_status = $row["authority"];
+		if ($admin_status == "super_admin") {
+			return $admin_status;
+		}
+	}
+	
+
+}
+
+// check_admin()
 
 
 

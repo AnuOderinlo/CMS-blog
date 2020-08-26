@@ -1,7 +1,21 @@
 <?php 
-  // require_once ("register_processing.php"); 
+  /*require_once 'include/session.php';*/
+  require_once 'include/functions.php';
+  require_once 'include/config.php';
+
+  session_start();
+  getSessionId();
+
+  if(isset($_SESSION['user_login'])) destroySession();
+
+  if(empty($_SESSION['token']) && empty($_SESSION['token_time'])){
+    $_SESSION['token'] = uniqid();
+    $_SESSION['token_time'] = time() + 3600;
+  }
+
+  $token =  $_SESSION['token'];
   
-?>
+ ?>
 
 
 <!DOCTYPE html>
@@ -41,11 +55,11 @@
       
       <div class="row">
         <div class="col-md-6 offset-md-3">
-          <form class="registerationForm" action="register_processing.php" method="post">
+          <form class="registerationForm" action="" method="post">
 
             <input type="hidden" value="<?php echo $token; ?>" name="token">
             <div class="card mb-3">
-              <div class="card-header bg-secondary text-white ">
+              <div class="card-header bg-secondary text-white">
                 <h5 class="text-white errorMsg" id="err">Just a step to become a blogger</h5>
               </div>
               <div class="card-body text-white bg-dark">
@@ -107,7 +121,7 @@
                 
                 <div>
                   <input type="hidden" name="submit">
-                  <button type="submit" class="btn btn-info btn-block" name="submit">Register</button>
+                  <button type="submit" id="btn" class="btn btn-info btn-block" name="submit">Register</button>
                 </div>
               </div>
             </div>
@@ -138,51 +152,51 @@
   let confirm_password_value = document.getElementById("cPassword"); 
   let err = document.getElementById("err"); 
   // Password validation
-  // let btn = document.getElementById("btn");
+  let btn = document.getElementById("btn");
 
-  // btn.addEventListener("click", function (e) {
-  //   e.preventDefault();
-  //   if (password_value.value !== confirm_password_value.value ) {
-  //     err.innerHTML = '<span style="color:red">Password don\'t match</span>'
-  //   }
-  // } ,false)
-
-
-  $(document).ready(function(){
-    // $("#password").keydown(function(event) {
-    //     if (event.ctrlKey==true && (event.which == '118' || event.which == '86')) {
-    //         alert('thou. shalt. not. PASTE!');
-    //         event.preventDefault();
-    //      }
-    // });
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    if (password_value.value !== confirm_password_value.value ) {
+      err.innerHTML = '<span style="color:red">Password don\'t match</span>'
+    }
+  } ,false)
 
 
-    $(".registerationForm").on("submit", (function(event){
-      event.preventDefault();
+  
 
-      $.ajax({
-        url:"register_processing.php",
-        method:"POST",
-        data: new FormData(this),
-        contentType: false,
-        processData: false,
-        success:function(data){
-          // console.log("data");
-          if(data == "Field(s) can't be empty" || data == "Password  characters can not be less than 4" || data == "Passwords doesn't match" || data == "Username already exist, use another one"|| data == "Something went wrong"){
-            $(".registerationForm")[0].reset();
-            $(".errorMsg").html(`<div  id="error" class=" text-white bg-danger p-2 ">${data}</div>`);
-          }
-          else{
-            $(".errorMsg").html(`<div  id="error" class=" text-white bg-success p-2 ">${data}</div>`);
-          }
+
+
+  // $(document).ready(function(){
+  //   $("#password").keydown(function(event) {
+  //       if (event.ctrlKey==true && (event.which == '118' || event.which == '86')) {
+  //           alert('thou. shalt. not. PASTE!');
+  //           event.preventDefault();
+  //        }
+  //   });
+
+
+  //   $(".registerationForm").on("submit", (function(event){
+  //     event.preventDefault();
+
+  //     $.ajax({
+  //       url:"registerProcessor.php",
+  //       method:"POST",
+  //       data: new FormData(this),
+  //       contentType: false,
+  //       processData: false,
+  //       success:function(data){
+  //         if(data == "yeah"){
+  //           $(".registerationForm")[0].reset();
+  //           $(".errorMsg").html("Good to see you again!");
+  //         }
+  //         else{
+  //           $(".errorMsg").html(data);
+  //         }
           
-        }
-      })
-
-
-    }))
-
-  })
+  //       }
+  //     })
+  //   }))
+  // })
 </script>
 
     <?php require 'template/footer.php'; ?>
