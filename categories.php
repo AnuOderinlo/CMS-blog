@@ -1,57 +1,14 @@
 <?php 
-  require_once 'include/session.php';
-  require_once 'include/functions.php';
-  require_once 'include/config.php';
+  require 'template/nav.php'; 
   $_SESSION['trackingUrl'] = $_SERVER['PHP_SELF'];
-  confirmLogin();
-  if (isset($_POST["submit"])) {
-    $category = sanitizeString($_POST["categoryTitle"]);
-    date_default_timezone_set("Africa/Lagos");
-    $date = date("d/M/Y h:ia", time());
-    $author = $_SESSION["adminName"];
-    if (empty($category)) {
-      $_SESSION["errorMessage"] = "That can not be empty";
-      Redirect("categories.php");
-    }elseif (strlen($category)< 3) {
-      $_SESSION["errorMessage"] = "Category name characters can not be less than 3";
-      Redirect("categories.php");
-    }else{
 
-      $sql = "INSERT INTO category (title, author, date) VALUES (?,?,?)";
-      $connect = $db->prepare($sql);
-      $connect->bind_param("sss", $category, $author, $date);
-      $connect = $connect->execute();
-      if ($connect) {
-        $_SESSION["successMessage"] = "Successfully added a category";
-        Redirect("categories.php");
-      }else{
-        $_SESSION["errorMessage"] = "Couldn't add a category, something went wrong";
-        Redirect("categories.php");
-      }
-    }
-  }
+  $categories = Category::find_all();
   
  ?>
 
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-    <link rel="stylesheet" type="text/css" href="css/css/all.css">
-
-    <title>CMS|project</title>
-  </head>
-  <body>
-    <header class="container-fluid bg-dark">
-      <?php require 'template/nav.php'; ?>
+   
       <div class="row bg-primary" style="height: 3.5px"></div>
       <div class="container text-white">
         <div class="row">
@@ -66,10 +23,8 @@
     <section class="container">
       <div class="row py-4">
         <div class="offset-md-2 col-md-8 mb-5">
-          <?php echo errorMessage(); 
-                echo successMessage(); 
-          ?>
-          <form action="categories.php" method="post">
+          <div id="errorMsg"></div>
+          <form action="category_processor.php" method="post" id="form">
             <div class="card text-white">
               <div class="card-header bg-secondary">
                 <h3>Add New Category</h3>
@@ -84,6 +39,7 @@
                     <a href="dashboard.php" class="btn btn-secondary btn-block"><i class="fas fa-arrow-left"></i> Back to Dashboard </a>
                   </div>
                   <div class="col-6">
+                    <input type="hidden" name="submit">
                     <button type="submit" name="submit" class="btn btn-success btn-block"><i class="fas fa-check"></i> Publish</button>
                   </div>
                 </div>
@@ -99,44 +55,100 @@
               <tr class="text-center">
                 <th class="">No.</th>
                 <th>Date&Time</th>
-                <th>Category Name</th>
+                <!-- <th>Category Name</th> -->
                 <th>Creator Name</th>
                 <th>Action</th>
               </tr>
             </thead>
             
             <?php 
-              // $id = $_GET['id'];
-              $sql = "SELECT * FROM category";
-              $connect = $db->query($sql);
+              
 
               $sn = 0;
-              while ($row = $connect->fetch_assoc()) {
+              foreach ($categories as $category) :
                 $sn++;
-                $date = $row['date'];
-                $category = $row['title'];
-                $creator = $row['author'];
             ?>
                 
             
             <tr>
               <td class=""><?php echo $sn ?></td>
-              <td><?php echo $date; ?></td>
-              <td><?php echo $creator ?></td>
-              <td><?php echo $category?></td>
+              <td><?php echo $category->date; ?></td>
+              <td><?php echo $category->title?></td>
               <td class="text-center">
-                <a href="deleteCategory.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">
-                  Delete <i class=" far fa-trash-alt"></i>
-                </a>
+                <a href="#myModal" class="btn btn-sm btn-danger delete_link" data-id="<?php echo $category->id ?>" data-toggle="modal">Delete <i class=" far fa-trash-alt"></i> </a>
               </td>
               
             </tr>
 
-          <?php } ?> 
+          <?php endforeach;  ?> 
           </table>
+          <!-- Modal -->
+          <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <!-- modal header goes here -->
+                <div class="modal-header text-center">
+                  <h4 class="modal-title">Are you sure you want to delete this category?</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                
+                <!-- modal footer goes here -->
+                <div class="modal-footer justify-content-center">
+                  <a href="" class="btn btn-danger comment_id">Yes</a>
+                  <button type="button" class="btn btn-info" data-dismiss="modal">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
+
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("#form").on("submit", function (e) {
+          e.preventDefault();
+          // $(".errorMsg").hide();
+          $.ajax({
+            url:"category_processor.php",
+            method:"POST",
+            data:$("#form").serialize(),
+            success:function(data){
+              if (data == "Field can not be empty" || data == "Category name characters can not be less than 3") {
+                $("#errorMsg").html(`<div  id="error" class="alert alert-danger ">${data}</div>`);
+                // $("#form")[0].reset()
+                console.log(data);
+                // $("#errorMsg").show();
+              }else{
+                // console.log(typeof data);
+                console.log(data);
+                $("#errorMsg").html(`<div  id="error" class="alert alert-success">${data}</div>`);
+                // console.log(data);
+                $("#form")[0].reset()
+                $("div#errorMsg").hide();
+                window.location.reload();
+
+              }
+            }
+          })
+        })
+
+        $(".delete_link").click(function () {
+          var id = $(this).attr("data-id");
+          var value = "deleteCategory.php?id=<?php ?>" + id
+          $(".comment_id").attr("href", value)
+            console.log(value);
+
+        })
+      
+
+       
+      })
+    </script>
 
     <?php require 'template/footer.php'; ?>
     

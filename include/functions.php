@@ -1,10 +1,6 @@
 <?php 
-	require_once 'config.php';
-	function Redirect($location)
-	{
-		header("Location:".$location);
-		exit;
-	}
+	// require_once 'config.php';
+	
 
 /*This functions checks the existence of a username*/
 	function checkUsername($username)
@@ -49,16 +45,7 @@
 		}
 	}
 
-	// This fucntions returns total number of rows in a table
-	function totalRow($table)
-	{
-		global $db;
-		$sql = "SELECT * FROM $table";
-		$connect = $db->query($sql);
-
-		$totalRow = mysqli_num_rows($connect);
-		return $totalRow;
-	}
+	
 
 	function totalRowPost($table)
 	{

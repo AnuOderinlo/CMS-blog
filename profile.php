@@ -1,7 +1,7 @@
 <?php 
-  require_once 'include/session.php';
-  require_once 'include/functions.php';
-  require_once 'include/config.php';
+  require 'template/header.php'; 
+  // require_once 'include/functions.php';
+  // require_once 'include/config.php';
 
   if (isset($_GET['author'])) {
     $author = $_GET['author'];
@@ -9,62 +9,57 @@
   }else{
     Redirect("blog.php");
   }
-  $sql = "SELECT * FROM  admins WHERE adminName='$author'";
-  $connect = $db->query($sql);
-  if ($connect) {
-    // print_r($connect);
-    foreach ($connect as $row) {
-      $adminId = $row['id'];
-      $adminName = $row['adminName'];
-      $headline = $row['headline'];
-      $username = $row['username'];
-      $about = $row['about'];
-      $image = $row['image'];
-      $adminAry = explode(" ",$adminName);
-      $firstname = $adminAry[0];
 
-      // echo $adminName;
-    }
-  }else{
-    echo "It didnt connect";
+  $admin = new User();
+  $users = $admin->author($author);
+  foreach ($users as $user) {
+    // $user->image = $admin->user_image;
+    $user->adminName;
+    $adminAry = explode(" ",$user->adminName);
+    $firstname = $adminAry[0];
   }
+  // print_r($adminAry);
+
+  // print_r($author);
+  // $sql = "SELECT * FROM  admins WHERE adminName='$author'";
+  // $connect = $db->query($sql);
+  // if ($connect) {
+  //   // print_r($connect);
+  //   foreach ($connect as $row) {
+  //     $adminId = $row['id'];
+  //     $adminName = $row['adminName'];
+  //     $headline = $row['headline'];
+  //     $username = $row['username'];
+  //     $about = $row['about'];
+  //     $image = $row['image'];
+  //     $adminAry = explode(" ",$adminName);
+  //     $firstname = $adminAry[0];
+
+  //     // echo $adminName;
+  //   }
+  // }else{
+  //   echo "It didnt connect";
+  // }
 
   // echo $adminName;
 
  ?>
 
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-    <link rel="stylesheet" type="text/css" href="css/css/all.css">
-
-    <title>Profile</title>
-  </head>
-  <body>
-    <?php require 'template/header.php'; ?>
+    
 
     <!-- Main Content -->
     <section class="container-fluid" style="margin-top: -1em">
       <div class="row">
         <div class="col-md-4 p-0" >
-          <aside class="bg-primary " style="background-image: url(images/<?php echo $image; ?>);"></aside>
+          <aside class="" style="background-image: url(<?php echo $user->picture_path(); ?>);"></aside>
         </div>
         <main class="col-md-5 pt-md-5 pt-0" >
-          <h1 class="mb-0">Hi, I'm <?php echo $adminName; ?></h1>
+          <h1 class="mb-0">Hi, I'm <?php echo $user->adminName; ?></h1>
           <div class="mb-5">
-            <p class="lead mb-3"><?php echo $headline; ?></p>
-            <h4>About <?php echo $adminName; ?></h4>
+            <p class="lead mb-3"><?php echo $user->headline; ?></p>
+            <h4>About <?php echo $user->adminName; ?></h4>
             <hr>
-            <p><?php echo $about; ?></p>
+            <p><?php echo $user->about; ?></p>
             
           </div>
 
@@ -80,31 +75,26 @@
           <!-- recent post starts here -->
           <div class="card mb-5">
             <div class="card-header bg-dark text-white">
-              <h5>Recent Posts by <?php echo $firstname; ?></h5>
+              <h5>Recent Posts by <?php echo $firstname?></h5>
             </div>
             <div class="card-body">
           <?php 
-            $sql = "SELECT * FROM posts WHERE admin_id='$adminId' ORDER BY id desc LIMIT 0,5 ";
-            $connect = $db->query($sql);
+            $sql = "SELECT * FROM posts WHERE admin_id='$user->id' ORDER BY id desc LIMIT 0,5 ";
+            $posts = Post::find_this_query($sql);
 
-            while ($row = $connect->fetch_assoc()) {
-              $id = $row["id"];
-              $title = htmlentities($row['title']);
-              $date = htmlentities($row['date']);
-              $author = htmlentities($row['author']);
-              $post = htmlentities($row['post']);
-              $image = htmlentities($row['image']);
+            foreach ($posts as $post):
+           
            ?>
             
               <div class="media mt-1">
-                <img src="upload/<?php echo $image ?>" class="" style="width: 70px; height: 60px">
+                <img src="<?php echo $post->picture_path() ?>" class="" style="width: 70px; height: 60px">
                 <div class="media-body ml-3">
-                  <h6><a href="fullPost.php?id=<?php echo $id ?>" style="color: grey" target = "_blank"><?php echo $title; ?></a></h6>
-                  <p class="text-secondary"><i class="fas fa-calendar "></i> <?php echo $date; ?></p>
+                  <h6><a href="fullPost.php?id=<?php echo $id ?>" style="color: grey" target = "_blank"><?php echo $post->title; ?></a></h6>
+                  <p class="text-secondary"><i class="fas fa-calendar "></i> <?php echo $post->date; ?></p>
                 </div>
               </div>
               <hr>
-          <?php } ?>
+          <?php endforeach; ?>
             </div>
           </div>
           <!-- recent post ends here -->

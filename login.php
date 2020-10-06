@@ -1,7 +1,10 @@
 <?php 
-  require_once 'include/session.php';
-  require_once 'include/functions.php';
-  require_once 'include/config.php';
+  // require_once 'include/session.php';
+  // require_once 'include/functions.php';
+  // require_once 'include/config.php';
+  require_once 'classes/init.php';
+
+  
 
   if (isset($_SESSION['adminId'])) {
     Redirect('dashboard.php');
@@ -11,26 +14,29 @@
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
     if (empty($username) || empty($password)) {
-      $_SESSION["errorMessage"] = "Field(s) can't be empty";
+      // $_SESSION["errorMessage"] = "Field(s) can't be empty";
+      $session->set_error_message("Field can't be empty");
       Redirect("login.php");
     }else{
-      $accountValid = verifyLogin($username, $password);
+      $accountValid = $user->verify_user($username, $password);
       if ($accountValid) {
-        $_SESSION["adminName"] = $accountValid['adminName'];
-        $_SESSION["username"] = $accountValid['username'];
-        $_SESSION["adminId"] = $accountValid['id'];
-        $_SESSION["about"] = $accountValid['about'];
-        $_SESSION["headline"] = $accountValid['headline'];
-        $_SESSION["about"] = $accountValid['image'];
-        $_SESSION["authority"] = $accountValid['authority'];
-        $_SESSION["successMessage"] = "Welcome ".$_SESSION["adminName"];
+        $_SESSION["adminName"] = $accountValid->adminName;
+        $_SESSION["username"] = $accountValid->username;
+        $_SESSION["adminId"] = $accountValid->id;
+        $_SESSION["about"] = $accountValid->about;
+        $_SESSION["headline"] = $accountValid->headline;
+        $_SESSION["about"] = $accountValid->image;
+        $_SESSION["authority"] = $accountValid->authority;
+        // $_SESSION["successMessage"] = "Welcome ".$_SESSION["adminName"];
+        $session->set_success_message("Welcome ".$_SESSION["adminName"]);
+        
         if ($_SESSION['trackingUrl']) {
           Redirect($_SESSION['trackingUrl']);
         }else{
           Redirect('dashboard.php');
         }
       }else{
-        $_SESSION["errorMessage"] = "Username or password is not correct";
+        $session->set_error_message("Username or password is not correct");
         Redirect('login.php');
       }
 
@@ -55,38 +61,37 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <link rel="stylesheet" type="text/css" href="css/css/all.css">
+    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
 
     <title>Login</title>
   </head>
-  <body>
+  <body class="login-body">
     <header class="container-fluid bg-dark mb-3">
       <nav class="navbar navbar-dark navbar-expand-md container ">
         <!-- Brand -->
         <a class="navbar-brand" href="blog.php">i<i class="font-weight-bold" style="color: red">Blog.com</i></a>
         
       </nav>
-      <div class="row bg-primary" style="height: 3.5px"></div>
+      <div class="row bg-light" style="height: 3.5px"></div>
     </header>
 
     <!-- Main Content -->
-    <section class="container">
+    <section class="container ">
       
-      <div class="row">
-        <div class="col-md-6 offset-md-3">
-          <?php echo errorMessage(); 
-                echo successMessage(); 
-          ?>
+      <div class="row justify-content-center viewport-height align-items-center ">
+        <div class="form-container">
+          <?php echo $session->error_message(); ?>
           <form class="" action="login.php" method="post">
-            <div class="card mb-3">
-              <div class="card-header bg-secondary text-white">
+            <div class=" mb-3">
+              <div class="card-header bg-dark text-white">
                 <h5 class="text-white">Good to see you again!</h5>
               </div>
-              <div class="card-body text-white bg-dark">
+              <div class="card-body text-white ">
                 <div class="form-group">
                   <label>Username</label>
                   <div class="input-group">
                     <div class="input-group-prepend">
-                      <span class="bg-info text-white input-group-text"><i class="fas fa-user"></i></span>
+                      <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-user"></i></span>
                     </div>
                     <input class="form-control" type="text" name="username"  value="">
                   </div>
@@ -95,16 +100,20 @@
                   <label>Password</label>
                   <div class="input-group">
                     <div class="input-group-prepend">
-                      <span class="bg-info text-white input-group-text"><i class="fas fa-lock"></i></span>
+                      <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-lock"></i></span>
                     </div>
-                    <input class="form-control" id="password" type="password" name="password"  value="">
+                    <input class="form-control border-0 " id="password" type="password" name="password"  value="">
                     <div class="input-group-append">
-                      <span class="bg-info text-white input-group-text" style="cursor: pointer;" id="lock" onclick="showPassword()"><i class="fas fa-eye"></i></span>
+                      <span class=" text-white input-group-text border-0 custom-bg" style="cursor: pointer;" id="lock" onclick="showPassword()"><i class="fas fa-eye"></i></span>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-info btn-block" name="submit">Sign in</button>
+                  <button type="submit" class="btn btn-block text-white  custom-bg" name="submit">Sign in</button>
+                </div>
+                <div class="text-center">
+                  <p><a  class="text-white" href="forget_password.php">Forgot your password?</a> </p>
+                  <p>Don't have an account? <a class="text-white"  href="register.php">Sign Up</a> </p>
                 </div>
               </div>
             </div>
@@ -113,7 +122,7 @@
       </div>
     </section>
 
-    <footer class="bg-dark text-white">
+    <!-- <footer class="bg-dark text-white">
       <div class="container">
         <div class="row">
           <div class="col">
@@ -121,7 +130,7 @@
           </div>
         </div>
       </div>
-    </footer>
+    </footer> -->
     
     
     <script type="text/javascript">
@@ -136,10 +145,17 @@
           password.type = "password";
         }
       }
+
+
+      $(document).ready(function () {
+        $(".close").click(function () {
+          $("#error").hide();
+        })
+      })
     </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script type="text/javascript" src="js/jquery-3.3.1.slim.min.js"></script>
+    <!-- <script type="text/javascript" src="js/jquery-3.3.1.slim.min.js"></script> -->
     <script type="text/javascript" src="js/popper.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     

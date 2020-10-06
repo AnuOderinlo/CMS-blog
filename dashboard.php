@@ -1,38 +1,32 @@
 <?php 
-  require_once 'include/session.php';
-  require_once 'include/functions.php';
-  require_once 'include/config.php';
+  // require_once 'include/session.php';
+  // require_once 'include/functions.php';
+  // require_once 'include/config.php';
   // require_once 'deletePost.php';
+  require 'template/nav.php';
   $_SESSION['trackingUrl'] = $_SERVER['PHP_SELF'];
-  confirmLogin();  
+   
   $admin_id= $_SESSION["adminId"];
   $admin_status = $_SESSION["authority"];
-  $sql = "SELECT * FROM posts WHERE admin_id=$admin_id";
-  $connect = $db->query($sql);
-  while ($row = $connect->fetch_assoc()) {
-    $id = $row["id"];
+  if ($user->check_super_admin()==$admin_status) {
+    $posts = $post->find_all();
+  }else{
+    $posts = $post->post_by_admin_order($admin_id);
   }
+  foreach ($posts as $post) {
+    $id_array[]=$post->id;
+  }
+  // $post->post_by_admin($admin_id);
+  // $sql = "SELECT * FROM posts WHERE admin_id=$admin_id";
+  // $connect = $db->query($sql);
+  // while ($row = $connect->fetch_assoc()) {
+  //   $admin_id = $row["admin_id"];
+  //   $id = $row['id'];
+  //   $id_array[]=$id;
+  
+  // }
  ?>
-
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-    <link rel="stylesheet" type="text/css" href="css/css/all.css">
-
-    <title>Dashboard</title>
-  </head>
-  <body>
-    <header class="container-fluid bg-dark mb-3">
-      <?php require 'template/nav.php'; ?>
+    
       <div class="row bg-primary" style="height: 3.5px"></div>
       <div class="container text-white">
         <div class="row pb-2 text-white">
@@ -45,7 +39,7 @@
             </a>
           </div>
           <?php 
-            if (check_super_admin()==$admin_status) {
+            if ($user->check_super_admin()==$admin_status) {
             
            ?>
           <div class="col-md-3 col mb-2">
@@ -60,7 +54,7 @@
           </div>
           <div class="col-md-3 col mb-2">
             <a href="comment.php" class="btn text-white btn-outline-success btn-block">
-              <i class="fas fa-check"></i> Approve comment
+              <i class="fas fa-check"></i> Manage comment
             </a>
           </div>
           <?php } ?>
@@ -71,33 +65,30 @@
 
     <!-- Main Content -->
     <section class="container">
-      <?php echo errorMessage(); 
-            echo successMessage(); 
-      ?>
-      
       <div class="row">
         <div class="col-md-3 col-3 d-none d-md-block">
           <div class="card bg-dark text-white mb-3">
-            <div class="card-body">
-              <h1>Posts</h1>
-              <h5>
-                <i class="fab fa-readme"></i>
-                <?php 
-                if (check_super_admin()==$admin_status) {
-                  echo totalRow("posts")>0 ? totalRow("posts") : 0;
-                }else{
-                  $sql = "SELECT * FROM posts WHERE admin_id=$admin_id";
-                  $connect = $db->query($sql);
-
-                  $totalRow = mysqli_num_rows($connect);
-                  echo $totalRow > 0 ? $totalRow : 0;
-                }
-                ?>
-              </h5>
-            </div>
+            <a href="post.php" class="text-decoration-none text-white" >
+              <div class="card-body">
+                <div>
+                    <h1>Posts</h1>
+                    <h5>
+                      <i class="fab fa-readme"></i>
+                      <?php 
+                      if ($user->check_super_admin()==$admin_status) {
+                        echo totalRow("posts")>0 ? totalRow("posts") : 0;
+                      }else{
+                        
+                        echo $post->totalRowPost($admin_id) > 0 ? $post->totalRowPost($admin_id) : 0;
+                      }
+                      ?>
+                    </h5>
+                </div>
+              </div>
+            </a>
           </div>
           <?php 
-            if (check_super_admin()==$admin_status) {
+            if ($user->check_super_admin()==$admin_status) {
             
            ?>
           <div class="card bg-dark text-white mb-3">
@@ -130,14 +121,17 @@
                 <i class="fab fa-readme"></i>
                 <?php 
                   // echo totalRow("comments");
-                  if (check_super_admin()==$admin_status) {
+                  if ($user->check_super_admin()==$admin_status) {
                     echo totalRow("comments")>0 ? totalRow("comments") : 0;
                   }else{
-                    $sql = "SELECT * FROM comments WHERE post_id=$id";
-                    $connect = $db->query($sql);
+                    for ($i=0; $i < count($id_array); $i++) { 
+                      // echo $id_array[$i]."<br>";
+                      // echo $id_array[$i];
+                      $totalRow = $comment->comment_by_post($id_array[$i]);
+                      $totalRow_array[] = $totalRow;
+                    }
 
-                    $totalRow = mysqli_num_rows($connect);
-                    echo $totalRow > 0 ? $totalRow : 0;
+                    echo array_sum($totalRow_array) > 0 ? array_sum($totalRow_array): 0 ;
                   }
                 ?>
               </h5>
@@ -146,12 +140,10 @@
         </div>
         <div class="col-md-9 ">
           <div class="">
-            <?php echo errorMessage(); 
-                  echo successMessage(); 
-            ?>
+            <?php echo $session->success_message(); ?>
             <h1>Top Posts</h1>
             <div class="table-responsive-md">
-              <table class="table table-bordered table-hover">
+              <table class="table table-bordered table-hover ">
                 <thead class="thead-dark align-center">
                   <tr >
                     <th>No.</th>
@@ -164,12 +156,10 @@
                 </thead>
                 
                 <?php 
-                  $sql = "SELECT * FROM posts WHERE admin_id=$admin_id  ORDER BY id desc LIMIT 0,5";
-                  $connect = $db->query($sql);
+                  
 
                   $sn = 0;
-                  while ($row = $connect->fetch_assoc()) {
-                    $id = $row['id'];
+                  foreach ($posts as $post) :
                     $sn++;
                 ?>
                     
@@ -179,23 +169,18 @@
                   <td>
                     <?php 
                       // if (strlen($row['title']) > 16) {
-                        echo $row['title'];
+                        echo $post->title;
                         // echo substr($row['title'], 0, 16)."..." ;
                       // }
                     ?>
                       
                   </td>
-                  <td><?php echo $row['date'] ?></td>
-                  <td><?php echo $row['author'] ?></td>
+                  <td><?php echo $post->date?></td>
+                  <td><?php echo $post->author ?></td>
                   <td>
                     <span class="badge badge-primary p-2">
                       <?php 
-                        echo comment("ON", $id);
-                      ?>
-                    </span>
-                    <span class="badge badge-danger p-2">
-                      <?php 
-                        echo comment("OFF", $id);
+                        echo $comment->comment_by_post($post->id);
                       ?>
                     </span>
                   </td>
@@ -204,7 +189,7 @@
                   </td>
                 </tr>
 
-              <?php } ?> 
+              <?php endforeach; ?> 
                </table>
              </div>
           </div>

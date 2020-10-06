@@ -10,6 +10,14 @@
     
     
     
+    <script type="text/javascript">
+      
+      $(document).ready(function () {
+        $(".close").click(function () {
+          $("#error").hide();
+        })
+      })
+    </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <!-- <script type="text/javascript" src="js/jquery-3.3.1.slim.min.js"></script> -->

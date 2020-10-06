@@ -1,21 +1,20 @@
 <?php 
-	require_once 'include/session.php';
-	require_once 'include/functions.php';
-	require_once 'include/config.php';
+	require_once 'classes/init.php';
+	
+	if (empty($_GET['id'])) {
+		redirect('comment.php');
+	}
 
 	if (isset($_GET['id'])) {
 		$id=$_GET['id'];
 	}
-	$admin = $_SESSION["adminName"];
-	$sql = "DELETE FROM comments WHERE id='$id'";
-	$connect = $db->query($sql);
+	$comment = Comment::find_by_id($_GET['id']);
 
-	if ($connect) {
-		$_SESSION["successMessage"] = "Successfully deleted comment";
-		Redirect('comment.php');
+	if ($comment) {
+		$comment->delete();
+		redirect('comment.php');
 	}else{
-		$_SESSION["errorMessage"] = "Something went wrong! unabale to delete";
-		Redirect('comment.php');
+		redirect('comment.php');
 	}
 
  ?>

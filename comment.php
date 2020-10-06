@@ -1,31 +1,9 @@
 <?php 
-  require_once 'include/session.php';
-  require_once 'include/functions.php';
-  require_once 'include/config.php';
-  // require_once 'deletePost.php';
+  require 'template/nav.php';
   $_SESSION['trackingUrl'] = $_SERVER['PHP_SELF'];
-  confirmLogin();  
+ 
+  
  ?>
-
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-    <link rel="stylesheet" type="text/css" href="css/css/all.css">
-
-    <title>Manage Comment</title>
-  </head>
-  <body>
-    <header class="container-fluid bg-dark mb-3">
-      <?php require 'template/nav.php'; ?>
       <div class="row bg-primary" style="height: 3.5px"></div>
       <div class="container text-white">
         <div class="row pb-2 text-white">
@@ -39,110 +17,96 @@
     <!-- Main Content -->
     
 
+    
     <section class="container">
-      <?php echo errorMessage(); 
-            echo successMessage(); 
-      ?>
-      <h2>Unapproved Comments</h2>
+      
+      <h2>All Comments</h2>
       <div class="table-responsive-md">
         <table class="table table-bordered table-sm table-hover">
           <!-- <caption>Unapproved Comments</caption> -->
           <thead class="thead-light align-center">
-            <tr class="text-center">
+            <tr class="">
               <th class="">No.</th>
               <th>Date&Time</th>
               <th>Name</th>
               <th>Comment</th>
-              <th colspan="2">Action</th>
+              <th>Post title</th>
+              <th>Action</th>
               <th>Details</th>
             </tr>
           </thead>
           
           <?php 
-            $sql = "SELECT * FROM comments WHERE status='OFF' ORDER BY id desc";
-            $connect = $db->query($sql);
-
+            $comments = $comment->find_comments();
             $sn = 0;
-            while ($row = $connect->fetch_assoc()) {
+            foreach ($comments as $comment):
               $sn++;
-              $date = $row['date'];
-              $name = $row['name'];
-              $comment = $row['comment'];
           ?>
-              
-          
-          <tr>
-            <td class=""><?php echo $sn ?></td>
-            <td><?php echo $date; ?></td>
-            <td><?php echo $name ?></td>
-            <td><?php echo $comment?></td>
-            <td><a href="approveComment.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-success">Approve</a></td>
-            <td>
-              <a href="deleteComment.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-            <td>
-              <a target="_blank" href="fullpost.php?id=<?php echo $row['post_id'] ?>"  class="btn btn-sm btn-info">live preview</a>
-            </td>
-          </tr>
-
-        <?php } ?> 
-        </table>
-      </div>
-    </section>
-    <section class="container">
-      <?php echo errorMessage(); 
-            echo successMessage(); 
-      ?>
-      <h2>Approved Comments</h2>
-      <div class="table-responsive-md">
-        <table class="table table-bordered table-sm table-hover">
-          <!-- <caption>Unapproved Comments</caption> -->
-          <thead class="thead-light align-center">
-            <tr class="text-center">
-              <th class="">No.</th>
-              <th>Date&Time</th>
-              <th>Name</th>
-              <th>Comment</th>
-              <th colspan="2">Action</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          
           <?php 
-            $sql = "SELECT * FROM comments WHERE status='ON' ORDER BY id desc";
-            $connect = $db->query($sql);
+            $post = $post->find_by_id($comment->post_id);
 
-            $sn = 0;
-            while ($row = $connect->fetch_assoc()) {
-              $sn++;
-              $date = $row['date'];
-              $name = $row['name'];
-              $comment = $row['comment'];
           ?>
-              
           
           <tr>
             <td class=""><?php echo $sn ?></td>
-            <td><?php echo $date; ?></td>
-            <td><?php echo $name ?></td>
-            <td><?php echo $comment?></td>
-            <td><a href="unapproveComment.php?id=<?php echo $row['id'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-thumbs-down"></i></a></td>
+            <td><?php echo $comment->date; ?></td>
+            <td><?php echo $comment->name ?></td>
+            <td><?php echo $comment->comment?></td>
+            <td><?php echo $post->title; ?></td>
+            <!-- <td><a href="unapproveComment.php?id=<?php echo $comment->id ?>" class="btn btn-sm btn-warning"><i class="fas fa-thumbs-down"></i></a></td> -->
             <td>
-              <a href="deleteComment.php?id=<?php echo $row['id'] ?>" class="text-white btn btn-sm btn-danger"><i class=" far fa-trash-alt"></i></a>
+              <a href="#myModal" class="btn btn-sm btn-danger delete_link" data-id="<?php echo $comment->id ?>" data-toggle="modal">Delete <i class=" far fa-trash-alt"></i></a>
+              <!-- <a href="#myModal" class="text-white btn btn-sm btn-danger">Delete <i class=" far fa-trash-alt"></i></a> -->
+              <!-- <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button> -->
             </td>
             <td>
-              <a target="_blank" href="fullpost.php?id=<?php echo $row['post_id'] ?>"  class="btn btn-sm btn-info">live preview</a>
+              <a target="_blank" href="fullpost.php?id=<?php echo $comment->post_id ?>"  class="btn btn-sm btn-info">live preview</a>
             </td>
           </tr>
 
-        <?php } ?> 
+          <!-- Modal -->
+          <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <!-- modal header goes here -->
+                <div class="modal-header text-center">
+                  <h4 class="modal-title">Are you sure you want to delete this comment?</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                
+                <!-- modal footer goes here -->
+                <div class="modal-footer justify-content-center">
+                  <a href="deleteComment.php?id=<?php echo $comment->id ?>" class="btn btn-danger comment_id">Yes</a>
+                  <button type="button" class="btn btn-info" data-dismiss="modal">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        <?php endforeach;  ?> 
         </table>
       </div>
     </section>
 
+    
+
 
     
-    
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $(".delete_link").click(function () {
+          var id = $(this).attr("data-id");
+          var value = "deleteComment.php?id=<?php ?>" + id
+          $(".comment_id").attr("href", value)
+            
+
+        })
+      })
+
+      
+    </script>
     <?php require 'template/footer.php'; ?>
     
   </body>

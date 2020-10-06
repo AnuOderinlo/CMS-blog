@@ -1,47 +1,38 @@
 <?php 
-  require_once 'include/session1.php';
+  require_once "classes/init.php";
+ /* require_once 'include/session1.php';
   require_once 'include/functions.php';
   require_once 'include/config.php';
-  // echo "Its working";
-  // if (isset($_POST["submit"])) {
-  //   echo $_POST["commentName"]."<br>";
-  //   echo $_POST["commentEmail"]."<br>";
-  //   echo $_POST["commentText"]."<br>";
-  // }else{
-  //   echo "Not set";
-  // }
-  
+*/
 
 if (isset($_POST["submit"])) {
 
     date_default_timezone_set("Africa/Lagos");
-    $idUrl = $_POST['id'];
+    $post_id = $validator->sanitize_string($_POST['id']);
+
     $today = date("d/M/Y h:ia", time());
-    $commentName = sanitizeString($_POST["commentName"]);
-    $commentEmail = sanitizeString($_POST["commentEmail"]);
-    $commentText = sanitizeString($_POST['commentText']);
-    // var_dump($_FILES);
-      // var_dump($commentName);
+    $commentName = $validator->sanitize_string($_POST["commentName"]);
+    $commentEmail = $validator->sanitize_string($_POST["commentEmail"]);
+    $commentText = $validator->sanitize_string($_POST['commentText']);
     if (empty($commentName) || empty($commentEmail) || empty($commentText)  ) {
-      $_SESSION["errorMessage"] = "Field can't be empty";
-      echo errorMessage();
-      // Redirect("fullPost.php?id=$idUrl");
+      // $session->message("Field can't be empty");
+      // echo $message;
+      // $session->set_error_message("Field can't be empty");
+      // echo $session->error_message();
+      echo "Field can't be empty";
+    
     }elseif (strlen($commentText) > 499) {
-      // echo "Maximum characters reach(500 characters)";
-      $_SESSION["errorMessage"] = "Maximum characters reach(500 characters)";
-      echo errorMessage();
-      // Redirect("fullPost.php?id=$idUrl");
-    }elseif (!validator($commentEmail)) {
-      $_SESSION["errorMessage"] = "Invalid Email";
-      // echo "Invalid Email";
-      echo errorMessage();
-      // Redirect("fullPost.php?id=$idUrl");
+      // $session->message("Maximum characters reach(500 characters)");
+      echo "Maximum characters reach(500 characters)";
+      // echo $message;
+    }elseif (!$validator->form_validator($commentEmail)) {
+      // $session->message("Invalid Email");
+      echo "Invalid Email";
+      // echo $message;
+     
     }else{
-      // echo "successful";
-      $sql = "INSERT INTO comments (post_id, date, name, email, comment) VALUES (?,?,?,?,?)";
-      $connect = $db->prepare($sql);
-      $connect->bind_param("issss", $idUrl, $today, $commentName, $commentEmail, $commentText);
-      $connect = $connect->execute();
+     
+      $comment->create_comment($post_id, $today, $commentName, $commentEmail, $commentText);
       echo<<<END
         <div class="media border mt-3 p-3 mb-2">
           <div class="row">
@@ -58,12 +49,7 @@ if (isset($_POST["submit"])) {
           </div>
         </div>
       END;
-
-      
-
-
     }
+
   }
-
-
- ?>
+?>

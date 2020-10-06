@@ -1,3 +1,6 @@
+
+
+
 main, aside {
   width: 100%;
 }
@@ -25,6 +28,39 @@ aside {
     /*top: 0;*/
   }
 }
+
+.login-body{
+  background-image: url("../images/login-bg2.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+
+.viewport-height{
+  height: 100vh
+}
+
+.form-container{
+  min-width: 50%
+}
+
+.form-container .card-body{
+  background: rgba(9, 15, 15, 0.5);
+}
+.custom-bg{
+  background: rgba(71, 8, 21, 0.7);
+}
+
+.custom-bg:hover{
+  background: rgb(71, 8, 21);
+}
+
+.custom-container{
+  background-color: #ffff;
+  padding: 20em;
+  
+}
+
 
 /*main {
   float: left;

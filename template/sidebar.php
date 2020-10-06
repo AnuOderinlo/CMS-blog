@@ -1,3 +1,9 @@
+<?php 
+
+  $categories = Category::find_all();
+
+ ?>
+
 <!-- side bar starts here -->
 <div class="col-md-4">
   <div class="card">
@@ -34,27 +40,21 @@
     </div>
     <div class="card-body">
   <?php 
-    $sql = "SELECT * FROM posts ORDER BY id desc LIMIT 0,5";
-    $connect = $db->query($sql);
+    $results= $post->recent_post();
+    foreach ($results as $result):
+      $post->image = $result->image;
 
-    while ($row = $connect->fetch_assoc()) {
-      $id = $row["id"];
-      $title = htmlentities($row['title']);
-      $date = htmlentities($row['date']);
-      $author = htmlentities($row['author']);
-      $post = htmlentities($row['post']);
-      $image = htmlentities($row['image']);
    ?>
     
       <div class="media mt-3">
-        <img src="upload/<?php echo $image ?>" class="" style="width: 70px; height: 60px">
+        <img src="<?php echo $post->picture_path() ?>" class="" style="width: 70px; height: 60px">
         <div class="media-body ml-3">
-          <h6><a href="fullPost.php?id=<?php echo $id ?>" style="color: grey" target = "_blank"><?php echo $title; ?></a></h6>
-          <p class="text-secondary"><i class="fas fa-calendar "></i> <?php echo $date; ?></p>
+          <h6><a href="fullPost.php?id=<?php echo $result->id ?>" style="color: grey" target = "_blank"><?php echo $result->title; ?></a></h6>
+          <p class="text-secondary"><i class="fas fa-calendar "></i> <?php echo $result->date; ?></p>
         </div>
       </div>
       <hr>
-  <?php } ?>
+  <?php endforeach; ?>
     </div>
   </div>
   <!-- recent post ends here -->
@@ -62,21 +62,14 @@
   <!-- category post starts here -->
   <div class="card mb-5">
     <div class="card-header bg-info text-white">
-      <h5>Pupular category</h5></div>
+      <h5>Pupular category</h5>
+    </div>
     <div class="card-body">
       <?php 
-        $sql = "SELECT id, title FROM category";
-        $connect = $db->query($sql);
-
-        if ($connect) {
-          foreach ($connect as $row) {
-            $id = $row['id'];
-            $title = $row['title'];
-            echo '<a href="blog.php?category='.$title.'" target="_blank" class="btn btn-primary btn-sm mr-1 mb-1 ">'.$title.'</a>';
-          }
+        foreach ($categories as $category){
+          echo '<a href="blog.php?category='.$category->title.'"  class="btn btn-primary btn-sm mr-1 mb-1 ">'.$category->title.'</a>';
         }
        ?>
-      
     </div>
   </div>
 </div>

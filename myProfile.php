@@ -1,142 +1,125 @@
 <?php 
-  require_once 'include/session.php';
-  require_once 'include/functions.php';
-  require_once 'include/config.php';
+  require 'template/nav.php';
   $_SESSION['trackingUrl'] = $_SERVER['PHP_SELF'];
-  confirmLogin();
-
-  // fetching existing admin
-  $adminid = $_SESSION["adminId"];
-  $adminName = $_SESSION["adminName"];
   
 
-  $sql = "SELECT * FROM  admins WHERE id='$adminid'";
-  $connect = $db->query($sql);
-  if ($connect) {
-    foreach ($connect as $row) {
-      $adminName = $row['adminName'];
-      $headline = $row['headline'];
-      $username = $row['username'];
-      $about = $row['about'];
-      $image = $row['image'];
-    }
-  }else{
-    echo "It didnt connect";
-  }
+  $adminName = $_SESSION["adminName"];
+  $admin = $user->find_by_id($admin_id);
+  $admin_id = $admin->id;
+  $image = $admin->image;
+  
+  
+
+  
 
   // updating the admin
-  if (isset($_POST["submit"])) {
-
+  /*if (isset($_POST["submit"])) {
+    echo "working?";
+    $user = User::find_by_id($admin_id);
     date_default_timezone_set("Africa/Lagos");
-    $today = date("d/M/Y h:ia", time());
     // var_dump($today);
-    $author = $_SESSION["adminName"];
-    $name= sanitizeString($_POST['name']);
-    $headline = sanitizeString($_POST["headline"]);
-    $about= sanitizeString($_POST['about']);
-    $imageName = $_FILES['image']['name'];
-    $imageStored = "images/".basename("$imageName");
+    // echo $author = $_SESSION["adminName"];
+    $user->adminName= $validator->sanitize_string($_POST['name']);
+    $user->headline = $validator->sanitize_string($_POST["headline"]);
+    $user->about= $validator->sanitize_string($_POST['about']);
+    $user->image = $_FILES['image']['name'];
+    $imageStored = "images/".basename("$user->image");
     
    
     // var_dump($_FILES);
-    if (empty($name) && empty($headline) && empty($imageName) && empty($about)) {
-      $_SESSION["errorMessage"] = "No field to update!";
-      Redirect("myProfile.php");
-    }elseif (strlen($headline) > 29) {
-      $_SESSION["errorMessage"] = "What you do reach maximun characters";
-      Redirect("myProfile.php");
-    }
-    elseif (strlen($about) > 299) {
+    
+    if (strlen($user->about) > 299) {
       $_SESSION["errorMessage"] = "Maximum characters reach for About(300 characters)";
       Redirect("myProfile.php");
     }else{
       move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
 
-
-      if (!empty($imageName)) {
-        if ($image !== "myAvatar.png") {
-          unlink("images/".$image);
-        }
-        $sql = "UPDATE admins SET adminName=?, headline=?, image=?, about=? WHERE id='$adminid'";
-        $connect = $db->prepare($sql);
-        $connect->bind_param("ssss", $name, $headline, $imageName, $about);
+      if (!empty($user->image)) {
+        $user->update_profile_image($user->image);
+        Redirect("myProfile.php");
       }else{
-        $sql = "UPDATE admins SET adminName=?, headline=?, about=? WHERE id='$adminid'";
-        $connect = $db->prepare($sql);
-        $connect->bind_param("sss", $name, $headline, $about);
-        $connect->execute();
+        $user->update_profile();
         // update the post table too
-        $sql2 = "UPDATE posts SET author=? WHERE admin_id=?";
-        $connect2 = $db->prepare($sql2);
-        $connect2->bind_param("si", $name, $adminid);  
-        $connect2->execute();
-
+        $post->update_author($user->adminName, $admin_id);
+        Redirect("myProfile.php");
       }
       
-      // var_dump($sql);
-      // $connect = $db->query($sql);
-      // $connect2 = $db->query($sql2);
-      if ($connect && $connect2) {
-        $_SESSION["successMessage"] = "Successfully updated your profile";
-        Redirect("myProfile.php");
-      }else{
-        $_SESSION["errorMessage"] = "Couldn't update, something went wrong";
-        Redirect("myProfile.php");
-      }
     }
+  }*/
+
+
+  if (isset($_POST['submit'])) {
+    // echo "It is working";
+    $user = User::find_by_id($admin_id);
+    $user->adminName= $validator->sanitize_string($_POST['name']);
+    $user->headline = $validator->sanitize_string($_POST["headline"]);
+    $user->about= $validator->sanitize_string($_POST['about']);
+    $user->image = $_FILES['image']['name'];
+    $imageStored = "images/".basename("$user->image");
+
+
+    move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
+    if (empty($user->image)) {
+      $user->update_profile();
+      // update the post table too
+      // $post->update_author($user->adminName, $admin_id);
+    }else{
+      $user->update_profile_image($image, $admin_id);
+    }
+
+    $post->update_author($user->adminName, $admin_id);//this update the author in the post table as the user also update its name
+    Redirect("myProfile.php");
+
+    // if (strlen($user->about) > 299) {
+    //   $_SESSION["errorMessage"] = "Maximum characters reach for About(300 characters)";
+    //   Redirect("myProfile.php");
+    // }else{
+    //   move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
+
+    //   if (!empty($user->image)) {
+    //     $user->update_profile_image($user->image);
+    //     Redirect("myProfile.php");
+    //   }else{
+    //     $user->update_profile();
+    //     // update the post table too
+    //     $post->update_author($user->adminName, $admin_id);
+    //     Redirect("myProfile.php");
+    //   }
+      
+    // }
   }
   
  ?>
-  
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-    <link rel="stylesheet" type="text/css" href="css/css/all.css">
-
-    <title>My Profile</title>
-  </head>
-  <body>
-    <header class="container-fluid bg-dark">
-      <?php require 'template/nav.php'; ?>
       <div class="row bg-primary" style="height: 3.5px"></div>
       <div class="container text-white">
         <div class="row">
           <div class="col-md-12">
-            <h1><span class="fas fa-user" style="color: grey"></span> <?php echo $username; ?></h1>
+            <h1><span class="fas fa-user" style="color: grey"></span> <?php echo $admin->username; ?></h1>
           </div>
         </div>
       </div>      
     </header>
 
     <!-- Main Content -->
-    <section class="container">
+    <section class="container viewport-height">
       <div class="row py-4">
         <div class="col-md-3 offset-md-1 mb-5">
           <div class="card">
             <div class="card-body">
-              <img src="images/<?php echo $image ?>" class="card-img-top" alt="Profile-picture">
+              <img src="<?php echo $admin->picture_path()?>" class="card-img-top" alt="Profile-picture">
               <div>
-                <h2><?php echo $adminName; ?></h2>
-                <p class="lead font-italic"><?php echo $headline; ?></p>
+                <h2><?php echo $admin->adminName; ?></h2>
+                <p class="lead font-italic"><?php echo $admin->headline; ?></p>
                 <hr>
-                <p><?php echo $about; ?></p>
+                <p><?php echo $admin->about; ?></p>
               </div>
             </div>
           </div>
         </div>
         <div class="col-md-7">
           <?php 
-              echo errorMessage(); 
-              echo successMessage(); 
+              
           ?>
           <form action="myProfile.php" method="post" enctype="multipart/form-data">
             <div class="card text-white">
@@ -147,12 +130,12 @@
                 <div class="form-group">
                   <label class="form-check-label">Full name: </label>
                   <small class="text-muted">e.g John Doe</small>
-                  <input type="text" class="form-control" name="name" value="<?php echo $adminName ?> " placeholder="Full name please">
+                  <input type="text" class="form-control" name="name" value="<?php echo $admin->adminName ?> " placeholder="Full name please">
                 </div>
                 <div class="form-group">
                   <label for="select-category">What you do: </label>
                   <small class="text-muted">e.g Blogger, web developer etc.</small>
-                  <input type="text" class="form-control" name="headline" value="<?php echo $headline ?>"  placeholder="What you do">
+                  <input type="text" class="form-control" name="headline" value="<?php echo $admin->headline ?>"  placeholder="What you do">
                 </div>
                 <span class="text-danger">Image size must be less than 2MB</span>
                 <div class="custom-file mb-2">
@@ -161,7 +144,7 @@
                 </div>
                 <div class="form-group purple-border">
                   <label for="post">About:</label>
-                  <textarea name="about" class="form-control" id="post" rows="7"> <?php echo $about ?></textarea>
+                  <textarea name="about" class="form-control" id="post" rows="7"> <?php echo $admin->about ?></textarea>
                 </div>
                 <div class="row">
                   <div class="col-6">

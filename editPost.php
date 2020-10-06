@@ -1,70 +1,9 @@
 <?php 
-  require_once 'include/session.php';
-  require_once 'include/functions.php';
-  require_once 'include/config.php';
+  require 'template/nav.php'; 
+  // require 'edit_processor.php';
+
   $_SESSION['trackingUrl'] = $_SERVER['PHP_SELF'];
-  confirmLogin();
-  if (isset($_POST["submit"])) {
-    $id = $_GET['id'];
-    date_default_timezone_set("Africa/Lagos");
-    $today = date("d/M/Y h:ia", time());
-    $author = $_SESSION["adminName"];
-    $postTitle = trim($_POST["postTitle"]);
-    $categorySelected = $_POST['category'];
-    $imageName = $_FILES['image']['name'];
-    $imageStored = "upload/".basename($imageName);
-    $postContent = $_POST['postContent'];
-
-    if (empty($postTitle)) {
-      $_SESSION["errorMessage"] = "Post title can't be empty";
-      Redirect("editPost.php");
-    }elseif (strlen($postTitle)< 5) {
-      $_SESSION["errorMessage"] = "Post title characters can not be less than 5";
-      Redirect("editPost.php");
-    }elseif (strlen($postContent) > 999) {
-      $_SESSION["errorMessage"] = "Maximum characters reach(1000 characters)";
-      Redirect("editPost.php");
-    }else{
-      move_uploaded_file($_FILES['image']['tmp_name'], $imageStored);
-      if (!empty($imageName)) {
-        $sql = "UPDATE posts SET title ='$postTitle', category='$categorySelected', post='$postContent', image='$imageName' WHERE id='$id'";
-      }else{
-        $sql = "UPDATE posts SET title ='$postTitle', category='$categorySelected', post='$postContent' WHERE id='$id'";
-      }
-
-      $connect = $db->query($sql);
-      // var_dump($id);
-      // var_dump($connect);
-      if ($connect) {
-        $_SESSION["successMessage"] = "Successfully updated a post";
-        Redirect("post.php");
-      }else{
-        $_SESSION["errorMessage"] = "Couldn't update post, something went wrong";
-        Redirect("post.php");
-      }
-    }
-  }
-  
  ?>
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-    <link rel="stylesheet" type="text/css" href="css/css/all.css">
-
-    <title>Edit post</title>
-  </head>
-  <body>
-    <header class="container-fluid bg-dark">
-      <?php require 'template/nav.php'; ?>
       <div class="row bg-primary" style="height: 3.5px"></div>
       <div class="container text-white">
         <div class="row">
@@ -80,53 +19,41 @@
       <div class="row py-4">
         <div class="offset-md-1 col-md-10">
           <?php 
-            echo errorMessage(); 
-            echo successMessage(); 
+           
 
-            $idUrl = $_GET['id'];
-            $sql = "SELECT * FROM posts WHERE id='$idUrl'";
-            $connect = $db->query($sql);
-
-            if ($connect) {
-              foreach ($connect as $row) {
-                $id = $row['id'];
-                $category = $row['category'];
-                $title = $row['title'];
-                $post = $row['post'];
-                $image = $row['image'];
-              }
-            }
+            $id = $_GET['id'];
+            $post= Post::find_by_id($id)
 
           ?>
-          <form action="editPost.php?id=<?php echo $id ?>" method="post" enctype="multipart/form-data">
+          <?php
+           echo $session->error_message(); 
+           echo $session->success_message(); 
+          ?>
+          <form action="edit_processor.php" method="post" enctype="multipart/form-data">
             <div class="card text-white">
               <div class="card-body bg-dark">
                 <div class="form-group">
                   <label class="form-check-label">Post Title: </label>
-                  <input type="text" class="form-control" name="postTitle" placeholder="Type a title" value="<?php echo $title ?>">
+                  <input type="hidden" name="id" value="<?php echo $post->id ?>">
+                  <input type="text" class="form-control" name="postTitle" placeholder="Type a title" value="<?php echo $post->title ?>">
                 </div>
                 <div class="form-group">
-                  <label for="select-category" class="text-primary">Existing category:</label> <?php echo $category; ?><br>
+                  <label for="select-category" class="text-primary">Existing category:</label> <?php echo $post->category; ?><br>
                   <label for="select-category">Choose a Category</label>
                   <select class="form-control" name="category" id="select-category">
                     <?php 
-                      $sql = "SELECT id, title FROM category";
-                      $connect = $db->query($sql);
+                      $categories = Category::find_all();
 
-                      if ($connect) {
-                        foreach ($connect as $row) {
-                          $id = $row['id'];
-                          $title = $row['title'];
-                          echo "<option>".$title."</option>";
-                        }
+                      foreach ($categories as $category) {
+                        echo "<option>{$category->title}</option>";
                       }
-                     ?>
+                    ?>
                 
                   </select>
                 </div>
                 <div class="mb-2">
                   <span class="text-primary">Existing image:</span>
-                  <img style="width: 120px; height: 62px;" src="upload/<?php echo $image ?>">
+                  <img style="width: 120px; height: 62px;" src="upload/<?php echo $post->image ?>">
                 </div>
                 <span class="text-danger">Image size must be less than 2MB</span>
                 <div class="custom-file mb-2">
@@ -135,11 +62,11 @@
                 </div>
                 <div class="form-group purple-border">
                   <label for="post">Post</label>
-                  <textarea name="postContent" class="form-control" id="post" rows="7"><?php echo $post; ?></textarea>
+                  <textarea name="postContent" class="form-control" id="post" rows="7"><?php echo $post->post; ?></textarea>
                 </div>
                 <div class="row">
                   <div class="col-6">
-                    <a href="#" class="btn btn-secondary btn-block"><i class="fas fa-arrow-left"></i> Back to Dashboard </a>
+                    <a href="dashboard.php" class="btn btn-secondary btn-block"><i class="fas fa-arrow-left"></i> Back to Dashboard </a>
                   </div>
                   <div class="col-6">
                     <button type="submit" name="submit" class="btn btn-success btn-block"><i class="fas fa-check"></i> Publish</button>

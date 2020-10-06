@@ -1,21 +1,19 @@
 <?php 
-	require_once 'include/session.php';
-	require_once 'include/functions.php';
-	require_once 'include/config.php';
+	require_once 'classes/init.php';
+
+	if (empty($_GET['id'])) {
+		redirect('categories.php');
+	}
 
 	if (isset($_GET['id'])) {
 		$id=$_GET['id'];
 	}
-	$admin = $_SESSION["adminName"];
-	$sql = "DELETE FROM category WHERE id='$id'";
-	$connect = $db->query($sql);
+	$category = Comment::find_by_id($_GET['id']);
 
-	if ($connect) {
-		$_SESSION["successMessage"] = "Successfully deleted a category";
-		Redirect('categories.php');
+	if ($category) {
+		$category->delete();
+		redirect('categories.php');
 	}else{
-		$_SESSION["errorMessage"] = "Something went wrong! unabale to delete";
-		Redirect('categories.php');
+		redirect('categories.php');
 	}
-
  ?>
