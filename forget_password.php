@@ -11,36 +11,39 @@
   }
 
   if (isset($_POST['submit'])) {
-    $username = $validator->sanitize_string($_POST['username']);
-    $password = $validator->sanitize_string($_POST['password']);
-    if (empty($username) || empty($password)) {
-      // $_SESSION["errorMessage"] = "Field(s) can't be empty";
-      $session->set_error_message("Field can't be empty");
-      Redirect("login.php");
-    }else{
-      $accountValid = $user->verify_user($username, $password);
-      if ($accountValid) {
-        $_SESSION["adminName"] = $accountValid->adminName;
-        $_SESSION["username"] = $accountValid->username;
-        $_SESSION["adminId"] = $accountValid->id;
-        $_SESSION["about"] = $accountValid->about;
-        $_SESSION["headline"] = $accountValid->headline;
-        $_SESSION["about"] = $accountValid->image;
-        $_SESSION["authority"] = $accountValid->authority;
-        $session->set_success_message("Welcome ".$_SESSION["adminName"]);
-        
-        if ($_SESSION['trackingUrl']) {
-          Redirect($_SESSION['trackingUrl']);
-        }else{
-          Redirect('dashboard.php');
+    $email =trim($_POST['email']);
+    $sql = "SELECT * from login WHERE email='$email'";
+    $connect = $db->query($sql);
+    if ($connect) {
+      $totalRow = mysqli_num_rows($connect);
+      if ($totalRow == 1) {
+        $newPassword = substr(md5(uniqid()),0,5);
+        $sql = "UPDATE login SET password='$newPassword', time='time()' WHERE email='$email'";
+        $connect = $db->query($sql);
+        if ($connect == false) {
+          echo "Didnt connect";
         }
+
+        $receiver = $email;
+        $subject = "Reset Password";
+        $message =  <<<email
+                  Dear user,
+                  Click on the following link to reset your password:
+                  http://localhost/studying-php/password/restorePassword.php
+                  New Password: {$newPassword}
+
+                  email;
+        $sender = "From: oderinloanuoluwapo@gmail.com";
+        mail($receiver, $subject, $message);
+
+
+        $_SESSION["successMessage"] = "Please check your Email for new password";
+        Redirect('forgetPassword.php');
       }else{
-        $session->set_error_message("Username, Email or Password is not correct");
-        Redirect('login.php');
-      }
-
+        $_SESSION["errorMessage"] = "Email not found";
+        Redirect('forgetPassword.php');
+      } 
     }
-
   }
 
 
@@ -80,38 +83,25 @@
       <div class="row justify-content-center viewport-height align-items-center ">
         <div class="form-container">
           <?php echo $session->error_message(); ?>
-          <form class="" action="login.php" method="post">
+          <form class="" action="" method="post">
             <div class=" mb-3">
               <div class="card-header bg-dark text-white">
-                <h5 class="text-white">Good to see you again!</h5>
+                <h5 class="text-white">Please supply your Email</h5>
               </div>
               <div class="card-body text-white ">
                 <div class="form-group">
-                  <label>Username or Email</label>
+                  <label>Email</label>
                   <div class="input-group">
                     <div class="input-group-prepend">
-                      <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-user"></i></span>
+                      <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-envelope"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="username"  value="">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Password</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-lock"></i></span>
-                    </div>
-                    <input class="form-control border-0 " id="password" type="password" name="password"  value="">
-                    <div class="input-group-append">
-                      <span class=" text-white input-group-text border-0 custom-bg" style="cursor: pointer;" id="lock" onclick="showPassword()"><i class="fas fa-eye"></i></span>
-                    </div>
+                    <input class="form-control" type="text" name="email"  value="">
                   </div>
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-block text-white  custom-bg" name="submit">Sign in</button>
+                  <button type="submit" class="btn btn-block text-white  custom-bg" name="submit">Submit</button>
                 </div>
                 <div class="text-center">
-                  <p><a  class="text-white" href="forget_password.php">Forgot your password?</a> </p>
                   <p>Don't have an account? <a class="text-white"  href="register.php">Sign Up</a> </p>
                 </div>
               </div>

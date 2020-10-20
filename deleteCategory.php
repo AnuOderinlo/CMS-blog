@@ -8,7 +8,7 @@
 	if (isset($_GET['id'])) {
 		$id=$_GET['id'];
 	}
-	$category = Comment::find_by_id($_GET['id']);
+	$category = Category::find_by_id($_GET['id']);
 
 	if ($category) {
 		$category->delete();

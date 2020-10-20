@@ -22,7 +22,7 @@
     <!-- Main Content -->
     <section class="container">
       <div class="row py-4">
-        <div class="offset-md-2 col-md-8 mb-5">
+        <div class=" col-md-6 mb-5">
           <div id="errorMsg"></div>
           <form action="category_processor.php" method="post" id="form">
             <div class="card text-white">
@@ -47,7 +47,7 @@
             </div>
           </form>
         </div>
-        <div class="table-responsive-md offset-md-2 col-md-8">
+        <div class="table-responsive-md  col-md-6">
           <h2>Existing Categories</h2>
           <table class="table table-bordered table-sm table-hover">
             <!-- <caption>Unapproved Comments</caption> -->
@@ -148,6 +148,7 @@
 
        
       })
+      
     </script>
 
     <?php require 'template/footer.php'; ?>

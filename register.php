@@ -1,5 +1,8 @@
 <?php 
   // require_once ("register_processing.php"); 
+  require 'classes/init.php';
+
+  $token = $validator->crfToken();
   
 ?>
 
@@ -40,13 +43,14 @@
 
       
       <div class="row  justify-content-center viewport-height align-items-center ">
-        <div class="form-container">
+        <div class="form-container ">
           <form class="registerationForm" action="register_processing.php" method="post">
+          <div class="errorMsg mb-2" id="err"></div>
 
             <input type="hidden" value="<?php echo $token; ?>" name="token">
             <div class=" mb-3">
               <div class="card-header bg-secondary text-white ">
-                <h5 class="text-white errorMsg" id="err">Just a step to become a blogger</h5>
+                <h5 class="text-white">Just a step to become a blogger</h5>
               </div>
               <div class="card-body text-white">
                 <div class="form-group">
@@ -174,10 +178,11 @@
             // console.log("data");
             if(data == "Field(s) can't be empty" || data == "Password  characters can not be less than 4" || data == "Passwords doesn't match" || data == "Username already exist, use another one"|| data == "Something went wrong"){
               $(".registerationForm")[0].reset();
-              $(".errorMsg").html(`<div  id="error" class=" text-white bg-danger p-2 ">${data}</div>`);
+              $(".errorMsg").html(`<div  id="error" class="alert  alert-danger ">${data}<button onclick="dismiss()" type="button" class="close" data-dismiss="modal">&times;</button></div>`);
             }
             else{
-              $(".errorMsg").html(`<div  id="error" class=" text-white bg-success p-2 ">${data}</div>`);
+              console.log(data);
+              $(".errorMsg").html(`<div  id="error" class="alert  alert-success ">${data}<button onclick="dismiss()" type="button" class="close" data-dismiss="modal">&times;</button></div>`);
             }
             
           }
@@ -187,6 +192,10 @@
       }))
 
     })
+
+    function dismiss() {
+      $("#error").hide();
+    }
   </script>
 
   

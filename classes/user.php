@@ -39,7 +39,7 @@
 			global $database;
 			$username = $database->escape_string($username);
 
-			$sql= "SELECT * FROM ".self::$db_table ." WHERE username='$username' AND password='$password' LIMIT 1";
+			$sql= "SELECT * FROM ".self::$db_table ." WHERE (username='$username' OR email='$username') AND password='$password' LIMIT 1";
 			$result_array = self::find_this_query($sql);
 
 			return !empty($result_array) ? array_shift($result_array) :  false;
@@ -149,6 +149,24 @@
 		}
 
 
+		/*This functions checks if an email exist*/
+		public function check_email($email){
+			global $database;
+			$sql = "SELECT email FROM  ".self::$db_table." WHERE email='$email'";
+			$connect = $database->query($sql);
+
+			$totalRow = mysqli_num_rows($connect);
+			if ($totalRow == 1) {
+				return true;
+			}else{
+				return false;
+			}
+		}
+			
+
+
+
+
 
 		public function author($author){
 			global $database;
@@ -199,6 +217,21 @@
 				return true;
 			}
 		}
+
+
+		public  function register_user($data){
+			global $database;
+
+			$sql ="INSERT INTO ".static::$db_table." (date, username, adminName, email, password, activation) VALUES (?,?,?,?,?,?)";
+			$connect = $database->prepare($sql);
+			$connect->bind_param("ssssss", $data['date'], $data['username'], $data['name'], $data['email'], $data['password'], "inactive");
+			if ($connect->execute()) {
+				return true;
+			}
+		}
+		
+
+
 
 
 
