@@ -20,7 +20,7 @@
       <div class="row py-4">
         <div class="offset-md-1 col-md-10">
           <div id="errorMsg"></div>
-          <form action="newPost.php" method="post" enctype="multipart/form-data" id="form">
+          <form action="new_post_processor.php" method="post" enctype="multipart/form-data" id="form">
             <div class="card text-white">
               <div class="card-header bg-secondary">
                 <h3>Feel free to add a post</h3>
@@ -46,7 +46,7 @@
                 </div>
                 <span class="text-danger">Image size must be less than 2MB</span>
                 <div class="custom-file mb-2">
-                  <input type="file" name="image" class="custom-file-input" id="customFile" value="image.jpg">
+                  <input type="file" name="image" class="custom-file-input" id="customFile">
                   <label class="custom-file-label" for="customFile">Choose image</label>
                 </div>
                 <div class="form-group purple-border">
@@ -68,47 +68,45 @@
         </div>
       </div>
     </section>
+    <?php require 'template/footer.php'; ?>
 
     <script type="text/javascript">
+
       $(document).ready(function() {
         // var input = $('input[name="image"]').val();
         // alert(input);
         $("#form").on("submit", function (e) {
           e.preventDefault();
-          // $(".errorMsg").hide();
           $.ajax({
             url:"new_post_processor.php",
             method:"POST",
-            data:$("#form").serialize(),
+            // data:$("#form").serialize(),
+            data: new FormData(this),
+            contentType : false,//
+            processData: false,
+           
             success:function(data){
-              console.log(data);
-            if (data === "Post title characters can not be less than 5") {
-              $("#errorMsg").html(`<div  id="error" class="alert alert-danger ">${data}</div>`);
 
+              if (data == "Title cannot be empty" || data == "Image cannot be empty" || data == "Post cannot be empty" || data == "Couldn't post, something went wrong") {
+                $("#errorMsg").html(`<div  id="error" class="alert alert-danger ">${data}<button onclick="dismiss()" type="button" class="close" data-dismiss="modal">&times;</button></div>`);
+                console.log(data)
+              }else{
+                $("#errorMsg").html(`<div  id="error" class="alert alert-success">${data}</div>`);
+              }
             }
-              // if (data == "Field can't be empty" || data == "Post title characters can not be less than 5" || data == "You need an image" || data== "Couldn't post, something went wrong") {
-              //   $("#errorMsg").html(`<div  id="error" class="alert alert-danger ">${data}</div>`);
-              //   // $("#form")[0].reset()
-              //   console.log(data);
-              //   // $("#errorMsg").show();
-              // }else{
-              //   // console.log(typeof data);
-              //   $("#errorMsg").html(`<div  id="error" class="alert alert-success">${data}</div>`);
-              //   // console.log(data);
-              //   $("#form")[0].reset()
-              //   $("div#errorMsg").hide();
 
-              // }
-            }
           })
-        })
-      
 
-       
+        })
+
       })
+
+      function dismiss() {
+        $("#error").hide();
+      }
     </script>
 
-    <?php require 'template/footer.php'; ?>
+    
     
   </body>
 </html>

@@ -16,27 +16,55 @@
 			$var = htmlentities($var);
 			$var = stripslashes($var);
 			$var = filter_var($var, FILTER_SANITIZE_STRING);
-			return $database->escape_string(trim($var));
+			return trim($var);
+			return $var;
 		}
 
 		public function form_validator($data){
-			// validate EMAIL
-			if (filter_var($data, FILTER_VALIDATE_EMAIL)) {
-				if (preg_match("/[a-zA-Z0-9_.]{3,}@[a-zA-Z]{4,}[.]{1}[a-zA-Z0-9.]{2,}/", $data)) {
-					return true;
-				}
-			}
 			// validate PHONE NUMBER
 			if (filter_var($data, FILTER_SANITIZE_NUMBER_INT)) {
 				return true;
+			}else{
+					return false;
 			}
 			// validate URL
 			if (filter_var($data, FILTER_VALIDATE_URL)) {
 				if (preg_match("/(https:|ftp:)\/\/+[a-zA-Z.0-9\?&\%\$\-\#]+\.[a-zA-Z.0-9\?&\%\$\-\#\/\_]*/", $data)) {
 					return true;
 				}
+			}else{
+					return false;
 			}
 		}
+
+
+		// validate EMAIL
+		public function email_validator($email){
+			$email = $this->sanitize_string($email);
+			if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+				if (preg_match("/[a-zA-Z0-9_.]{3,}@[a-zA-Z]{4,}[.]{1}[a-zA-Z0-9.]{2,}/", $email)) {
+					return $email;
+				}else{
+					return false;
+					// echo "Invalid email";
+				}
+			}else{
+					return false;
+					// echo "Invalid email";
+			}
+		}
+
+
+		/* this checks if an input is empty*/
+		public function isEmpty($data, $attribute)
+		{
+			if (!empty($data)) {
+				return $this->sanitize_string($data)  ;
+			}else{
+				echo "$attribute cannot be empty";
+			}
+		}
+
 
 		public static function crfToken(){
 			if(empty($_SESSION['crf_token'])){

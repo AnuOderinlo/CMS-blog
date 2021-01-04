@@ -13,39 +13,35 @@
   if (isset($_POST['submit'])) {
     $username = $validator->sanitize_string($_POST['username']);
     $password = $validator->sanitize_string($_POST['password']);
-    if (empty($username) || empty($password)) {
-      // $_SESSION["errorMessage"] = "Field(s) can't be empty";
-      $session->set_error_message("Field can't be empty");
-      Redirect("login.php");
-    }else{
-      $accountValid = $user->verify_user($username, $password);
-      if ($accountValid) {
-        $_SESSION["adminName"] = $accountValid->adminName;
-        $_SESSION["username"] = $accountValid->username;
-        $_SESSION["adminId"] = $accountValid->id;
-        $_SESSION["about"] = $accountValid->about;
-        $_SESSION["headline"] = $accountValid->headline;
-        $_SESSION["about"] = $accountValid->image;
-        $_SESSION["authority"] = $accountValid->authority;
-        $session->set_success_message("Welcome ".$_SESSION["adminName"]);
-        
-        if ($_SESSION['trackingUrl']) {
-          Redirect($_SESSION['trackingUrl']);
-        }else{
-          Redirect('dashboard.php');
-        }
+   
+    $accountValid = $user->verify_user($username, $password);
+    if ($accountValid) {
+      $_SESSION["adminName"] = $accountValid->adminName;
+      $_SESSION["username"] = $accountValid->username;
+      $_SESSION["adminId"] = $accountValid->id;
+      $_SESSION["about"] = $accountValid->about;
+      $_SESSION["headline"] = $accountValid->headline;
+      $_SESSION["about"] = $accountValid->image;
+      $_SESSION["authority"] = $accountValid->authority;
+      $session->set_success_message("Welcome ".$_SESSION["adminName"]);
+      
+      if ($_SESSION['trackingUrl']) {
+        Redirect($_SESSION['trackingUrl']);
       }else{
-        $session->set_error_message("Username, Email or Password is not correct");
-        Redirect('login.php');
+        Redirect('dashboard.php');
       }
-
+    }else{
+      $session->set_error_message("Username, Email or Password is not correct");
+      Redirect('login.php');
     }
 
   }
 
-
-  
  ?>
+
+
+
+
 
 
 <!DOCTYPE html>
@@ -79,6 +75,7 @@
       
       <div class="row justify-content-center viewport-height align-items-center ">
         <div class="form-container">
+          <?php echo $session->success_message(); ?>
           <?php echo $session->error_message(); ?>
           <form class="" action="login.php" method="post">
             <div class=" mb-3">
@@ -157,6 +154,8 @@
     <!-- <script type="text/javascript" src="js/jquery-3.3.1.slim.min.js"></script> -->
     <script type="text/javascript" src="js/popper.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    
+
     
   </body>
 </html>

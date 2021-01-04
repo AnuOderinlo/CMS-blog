@@ -68,8 +68,11 @@
             
 
             $sn = 0;
-            foreach ($posts as $post) :
+            if (!empty($posts)) {
+              foreach ($posts as $post) :
               $sn++;
+            
+            
           ?>
               
           
@@ -109,7 +112,7 @@
             </td>
           </tr>
 
-        <?php endforeach; ?> 
+        <?php endforeach; }?> 
          </table>
          <!-- Modal -->
          <div id="myModal" class="modal fade" role="dialog">

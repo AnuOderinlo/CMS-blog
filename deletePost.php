@@ -8,7 +8,7 @@
   if (isset($_GET['id'])) {
     $id=$_GET['id'];
   }
-  $post = Comment::find_by_id($_GET['id']);
+  $post = Post::find_by_id($_GET['id']);
 
   if ($post) {
     $post->delete();

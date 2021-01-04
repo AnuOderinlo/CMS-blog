@@ -44,8 +44,9 @@
       
       <div class="row  justify-content-center viewport-height align-items-center ">
         <div class="form-container ">
-          <form class="registerationForm" action="register_processing.php" method="post">
-          <div class="errorMsg mb-2" id="err"></div>
+          <form class="registerationForm" action="check.php" method="post">
+            <div class="errorMsg mb-2" id="err"></div>
+            <?php echo $session->error_message(); ?>
 
             <input type="hidden" value="<?php echo $token; ?>" name="token">
             <div class=" mb-3">
@@ -90,19 +91,6 @@
                       <span class=" custom-bg  border-0  text-white input-group-text"><i class="fas fa-lock" style="cursor: pointer;" onclick="showPassword()"></i></span>
                     </div>
                     <input class="form-control border-0 " type="password" name="password" id="password"  value="">
-                    <div class="input-group-append">
-                      <span class=" custom-bg  border-0  text-white input-group-text" style="cursor: pointer;" id="lock" onclick="showPassword()"><i class="fas fa-eye"></i></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Confirm Password</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class=" custom-bg  border-0  text-white input-group-text"><i class="fas fa-lock" style="cursor: pointer;" onclick="showPassword()"></i></span>
-                    </div>
-                    <input class="form-control border-0 " type="password" name="confirm_password" id="cPassword" placeholder="Retype password"  value="">
                     <div class="input-group-append">
                       <span class=" custom-bg  border-0  text-white input-group-text" style="cursor: pointer;" id="lock" onclick="showPassword()"><i class="fas fa-eye"></i></span>
                     </div>
@@ -169,21 +157,20 @@
         event.preventDefault();
 
         $.ajax({
-          url:"register_processing.php",
+          url:"check.php",
           method:"POST",
           data: new FormData(this),
           contentType: false,
           processData: false,
           success:function(data){
-            // console.log("data");
-            if(data == "Field(s) can't be empty" || data == "Password  characters can not be less than 4" || data == "Passwords doesn't match" || data == "Username already exist, use another one"|| data == "Something went wrong"){
-              $(".registerationForm")[0].reset();
-              $(".errorMsg").html(`<div  id="error" class="alert  alert-danger ">${data}<button onclick="dismiss()" type="button" class="close" data-dismiss="modal">&times;</button></div>`);
-            }
-            else{
+            if (data == "Username cannot be empty" || data == "Fullname cannot be empty" || data == "Email cannot be empty" || data == "Password cannot be empty" || data == "Username already exist" || data == "Email already exist" || data == "Invalid email" || data == "something went wrong" || data == "Sorry message not sent" ) {
               console.log(data);
+              $(".errorMsg").html(`<div  id="error" class="alert  alert-danger ">${data}<button onclick="dismiss()" type="button" class="close" data-dismiss="modal">&times;</button></div>`);
+
+            }else{
               $(".errorMsg").html(`<div  id="error" class="alert  alert-success ">${data}<button onclick="dismiss()" type="button" class="close" data-dismiss="modal">&times;</button></div>`);
             }
+           
             
           }
         })
@@ -196,6 +183,12 @@
     function dismiss() {
       $("#error").hide();
     }
+
+    $(document).ready(function () {
+      $(".close").click(function () {
+        $("#error").hide();
+      })
+    })
   </script>
 
   

@@ -3,16 +3,24 @@
   // require_once 'include/functions.php';
   // require_once 'include/config.php';
 
- require 'template/header.php';
+  require 'template/header.php';
+ 
   $post = new Post();
 
-  $page = !empty($_GET['page'])? $_GET['page']: 1;
+
+  $page = !empty($_GET['page']) && ctype_digit($_GET['page'])? $_GET['page']: 1;
   $items_per_page = 4;
   $total_items = Post::count_all(); 
 
   $paginate = new Paginate($page, $items_per_page, $total_items );
   $sql = "SELECT * FROM posts ORDER BY id desc LIMIT {$items_per_page} OFFSET {$paginate->offset()}";
   $posts = Post::find_this_query($sql);
+
+  if (isset($_GET['page'])) {
+    if ($_GET['page'] >  $paginate->total_page()) {
+      Redirect("blog.php");
+    }
+  }
   
   
 
@@ -25,10 +33,7 @@
         <div class="col-md-8">
           <!-- <h1>The complete Responsive CMS blog</h1> -->
           <!-- <h1 class="lead">The complete Blog by using PHP by Anuoluwapo Oderinlo</h1> -->
-          <?php 
-             /* echo errorMessage(); 
-              echo successMessage(); */
-          ?>
+          
           <?php 
             // search query
             if (isset($_GET['submit'])) {
@@ -51,7 +56,7 @@
               // Redirect('blog.php?page=1');
             }
              // $results=$post->post_by_default();
-             foreach ($posts as $post) :
+            foreach ($posts as $post) :
                 // $post->image = $result->image;
               // var_dump($result);
 
@@ -98,7 +103,8 @@
                   if ($paginate->has_previous()) {
                     echo "<li class='page-item'><a class='page-link' href='blog.php?page={$paginate->previous()}'><<</a> </li>" ;
                   }
-                
+
+
                   for ($i=1; $i <= $paginate->total_page() ; $i++) { 
                     if ($i == $page) {
                       echo "<li class='page-item active'><a class='page-link' href='blog.php?page=$i''>$i</a></li>";
@@ -107,6 +113,7 @@
 
                     }
                   }
+
                   if ($paginate->has_next()) {
                     echo "<li class='next'><a class='page-link' href='blog.php?page={$paginate->next()}'>>></a> </li>" ;
                   }
@@ -114,11 +121,7 @@
                   
                   
                 }
-               ?>
-
-
-             <!--  -->
-
+              ?>
             </ul>
           </nav>
         </div>
@@ -133,4 +136,6 @@
     <?php require 'template/footer.php'; ?>
     
   </body>
+
+
 </html>

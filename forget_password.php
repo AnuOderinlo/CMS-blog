@@ -1,51 +1,53 @@
 <?php 
-  // require_once 'include/session.php';
-  // require_once 'include/functions.php';
-  // require_once 'include/config.php';
   require_once 'classes/init.php';
-
-  
 
   if (isset($_SESSION['adminId'])) {
     Redirect('dashboard.php');
   }
 
+
   if (isset($_POST['submit'])) {
-    $email =trim($_POST['email']);
-    $sql = "SELECT * from login WHERE email='$email'";
-    $connect = $db->query($sql);
-    if ($connect) {
-      $totalRow = mysqli_num_rows($connect);
-      if ($totalRow == 1) {
-        $newPassword = substr(md5(uniqid()),0,5);
-        $sql = "UPDATE login SET password='$newPassword', time='time()' WHERE email='$email'";
-        $connect = $db->query($sql);
-        if ($connect == false) {
-          echo "Didnt connect";
-        }
+    $token = bin2hex(random_bytes(32));
+    $email = $validator->sanitize_string($_POST['email']);
+    $expire_time = date("U") + 3600;
+    $url = "http://localhost/cms-blog/restore_password.php?token=".$token;
+    
 
-        $receiver = $email;
-        $subject = "Reset Password";
-        $message =  <<<email
-                  Dear user,
-                  Click on the following link to reset your password:
-                  http://localhost/studying-php/password/restorePassword.php
-                  New Password: {$newPassword}
+    if ($validator->email_validator($email)) {
+   
+      if ($user->if_email_exist($email)) {
+        /*
+          Send email
+        */
+          $sql = "INSERT INTO password_recovery (email, activation_code, verification_time) VALUES (?, ?, ?)";
+          $stmt = $database->prepare($sql);
+          $stmt->bind_param("sss", $email,$token,$expire_time);
+          if ($stmt->execute()) {
 
-                  email;
-        $sender = "From: oderinloanuoluwapo@gmail.com";
-        mail($receiver, $subject, $message);
+            /*SEND EMAIL*/
+            
 
+            
+            $session->set_success_message("Please check your email");
+            Redirect('forget_password.php');
+          }else{
+            $session->set_error_message("Something went wrong");
+            Redirect('forget_password.php');
+          }
 
-        $_SESSION["successMessage"] = "Please check your Email for new password";
-        Redirect('forgetPassword.php');
       }else{
-        $_SESSION["errorMessage"] = "Email not found";
-        Redirect('forgetPassword.php');
-      } 
+        $session->set_error_message("Email doesn't exist");
+        Redirect('forget_password.php');
+      }
+      
+    }else{
+      // print_r($data);
+      $session->set_error_message("Invalid Email or field is empty");
+      Redirect('forget_password.php');
     }
-  }
 
+    
+  }
 
   
  ?>
@@ -65,7 +67,7 @@
     <link rel="stylesheet" type="text/css" href="css/css/all.css">
     <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
 
-    <title>Login</title>
+    <title>Forget password</title>
   </head>
   <body class="login-body">
     <header class="container-fluid bg-dark mb-3">
@@ -83,10 +85,11 @@
       <div class="row justify-content-center viewport-height align-items-center ">
         <div class="form-container">
           <?php echo $session->error_message(); ?>
+          <?php echo $session->success_message(); ?>
           <form class="" action="" method="post">
             <div class=" mb-3">
               <div class="card-header bg-dark text-white">
-                <h5 class="text-white">Please supply your Email</h5>
+                <h5 class="text-white">Please enter your Email</h5>
               </div>
               <div class="card-body text-white ">
                 <div class="form-group">

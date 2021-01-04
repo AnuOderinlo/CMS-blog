@@ -1,54 +1,67 @@
 <?php 
-  // require_once 'include/session.php';
-  // require_once 'include/functions.php';
-  // require_once 'include/config.php';
-  require_once 'classes/init.php';
-
   
+  require_once 'classes/init.php';
 
   if (isset($_SESSION['adminId'])) {
     Redirect('dashboard.php');
   }
 
+  if (isset($_GET["token"]) && !empty($_GET["token"])) {
+    $token = $_GET["token"];
+  }else{
+    Redirect("register.php");
+  }
+
+  $sql = "SELECT email, activation_code, verification_time FROM password_recovery WHERE activation_code=?";
+  $stmt = $database->prepare($sql);
+  $stmt->bind_param("s", $token);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  foreach ($result as $row) {
+    $expiryTime = $row['verification_time'];
+    $tokenDB = $row['activation_code'];
+    $email = $row['email'];
+  }
+
+ 
   if (isset($_POST['submit'])) {
-    $email =trim($_POST['email']);
-    $sql = "SELECT * from login WHERE email='$email'";
-    $connect = $db->query($sql);
-    if ($connect) {
-      $totalRow = mysqli_num_rows($connect);
-      if ($totalRow == 1) {
-        $newPassword = substr(md5(uniqid()),0,5);
-        $sql = "UPDATE login SET password='$newPassword', time='time()' WHERE email='$email'";
-        $connect = $db->query($sql);
-        if ($connect == false) {
-          echo "Didnt connect";
-        }
+    $new_password = $validator->sanitize_string($_POST['new_password']);
+    $confirm_password = $validator->sanitize_string($_POST['confirm_password']);
 
-        $receiver = $email;
-        $subject = "Reset Password";
-        $message =  <<<email
-                  Dear user,
-                  Click on the following link to reset your password:
-                  http://localhost/cms-blog/restorePassword.php
-                  New Password: {$newPassword}
+    if (time() < $expiryTime && $token === $tokenDB) {
 
-                  email;
-        $sender = "From: oderinloanuoluwapo@gmail.com";
-        mail($receiver, $subject, $message);
+      if ($new_password === $confirm_password) {
+
+        $password = $password->password_hashing($new_password);
+
+        /*Update the password in Admin table*/
+        $user->update_password($password, $email);
+
+        /*Delete the record where activation_ code is active from password_recovery table*/
+        $password->delete_password_token($token);
 
 
-        $_SESSION["successMessage"] = "Please check your Email for new password";
-        Redirect('forgetPassword.php');
+        $session->set_success_message("Password successfully changed");
+        Redirect('login.php');
       }else{
-        $_SESSION["errorMessage"] = "Email not found";
-        Redirect('forgetPassword.php');
-      } 
+        $session->set_error_message("Password(s) doesn't match");
+        Redirect('restore_password.php?token='.$token);
+      }
+
+    }else{
+     /*Delete the record where activation_ code is active from password_recovery table*/
+      $password->delete_password_token($token);
+      
+      $session->set_error_message("Time Expired!!!");
+      Redirect("forget_password.php");
     }
+    
   }
 
 
   
- ?>
+?>
 
 
 <!DOCTYPE html>
@@ -65,7 +78,7 @@
     <link rel="stylesheet" type="text/css" href="css/css/all.css">
     <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
 
-    <title>Login</title>
+    <title>Change password</title>
   </head>
   <body class="login-body">
     <header class="container-fluid bg-dark mb-3">
@@ -90,21 +103,12 @@
               </div>
               <div class="card-body text-white ">
                 <div class="form-group">
-                  <label>Token</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-key"></i></span>
-                    </div>
-                    <input class="form-control" type="text" name="token"  value="">
-                  </div>
-                </div>
-                <div class="form-group">
                   <label>New Password</label>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-lock"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="new_password"  value="">
+                    <input class="form-control" type="password" name="new_password"  value="">
                   </div>
                 </div>
                 <div class="form-group">
@@ -113,12 +117,12 @@
                     <div class="input-group-prepend">
                       <span class=" text-white input-group-text border-0 custom-bg"><i class="fas fa-lock"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="confirm_password"  value="">
+                    <input class="form-control" type="password" name="confirm_password"  value="">
                   </div>
                 </div>
                 
                 <div>
-                  <button type="submit" class="btn btn-block text-white  custom-bg" name="submit">Create</button>
+                  <button type="submit" class="btn btn-block text-white  custom-bg" name="submit">Reset password</button>
                 </div>
                 <div class="text-center">
                   <p>Don't have an account? <a class="text-white"  href="register.php">Sign Up</a> </p>

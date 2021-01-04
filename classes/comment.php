@@ -33,6 +33,14 @@
 			return self::find_this_query($sql);
 		}
 
+		/*Find all comments by limit to 5*/
+		public static function find_comments_limit($start, $limit, $id){
+			global $database;
+			$sql = "SELECT * FROM " . self::$db_table." WHERE post_id='$id' ORDER BY id asc LIMIT $start,$limit";
+			return $database->query($sql);
+			// return self::find_this_query($sql);
+		}
+
 
 		// This fucntions returns total number of rows 
 	  public	function comment_by_post($id){	

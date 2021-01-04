@@ -1,7 +1,7 @@
 <?php 
 	defined('DS')? null : define('DS', "/");
 	define('SITE_ROOT', 'C:' . DS . 'xampp' . DS . 'htdocs' . DS . 'CMS-blog' );
-	defined('INCLUDE_PATH')? null : define('INCLUDE_PATH', SITE_ROOT.DS.'admin'.DS.'includes');
+	// defined('INCLUDE_PATH')? null : define('INCLUDE_PATH', SITE_ROOT.DS.'admin'.DS.'includes');
 	require_once 'functions.php';
 	require_once 'config.php';
 	require_once 'database.php';
@@ -14,4 +14,5 @@
 	require_once 'posts.php';
 	require_once 'category.php';
 	require_once 'validator.php';
+	require_once 'password.php';
 ?>

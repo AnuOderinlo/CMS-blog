@@ -12,9 +12,15 @@
     $posts = $post->find_all();
   }else{
     $posts = $post->post_by_admin_order($admin_id);
+    
   }
-  foreach ($posts as $post) {
-    $id_array[]=$post->id;
+  if (!empty($posts)) {
+    # code...
+    foreach ($posts as $post) {
+      $id_array[]=$post->id;
+    }
+  }else{
+    $id_array = [];
   }
   // $post->post_by_admin($admin_id);
   // $sql = "SELECT * FROM posts WHERE admin_id=$admin_id";
@@ -71,18 +77,18 @@
             <a href="post.php" class="text-decoration-none text-white" >
               <div class="card-body">
                 <div>
-                    <h1>Posts</h1>
-                    <h5>
-                      <i class="fab fa-readme"></i>
-                      <?php 
-                      if ($user->check_super_admin()==$admin_status) {
-                        echo totalRow("posts")>0 ? totalRow("posts") : 0;
-                      }else{
-                        
-                        echo $post->totalRowPost($admin_id) > 0 ? $post->totalRowPost($admin_id) : 0;
-                      }
-                      ?>
-                    </h5>
+                  <h1>Posts</h1>
+                  <h5>
+                    <i class="fab fa-readme"></i>
+                    <?php 
+                    if ($user->check_super_admin()==$admin_status) {
+                      echo totalRow("posts")>0 ? totalRow("posts") : 0;
+                    }else{
+                      
+                      echo $post->totalRowPost($admin_id) > 0 ? $post->totalRowPost($admin_id) : 0;
+                    }
+                    ?>
+                  </h5>
                 </div>
               </div>
             </a>
@@ -130,8 +136,14 @@
                       $totalRow = $comment->comment_by_post($id_array[$i]);
                       $totalRow_array[] = $totalRow;
                     }
+                    if (!empty($totalRow_array)) {
+                      echo array_sum($totalRow_array) > 0 ? array_sum($totalRow_array): 0 ;
+                      # code...
+                    }else{
+                      echo 0 ;
 
-                    echo array_sum($totalRow_array) > 0 ? array_sum($totalRow_array): 0 ;
+                    }
+
                   }
                 ?>
               </h5>
@@ -159,8 +171,11 @@
                   
 
                   $sn = 0;
-                  foreach ($posts as $post) :
-                    $sn++;
+                  if (!empty($posts)) {
+                    foreach ($posts as $post) :
+                      $sn++;
+                    # code...
+                  
                 ?>
                     
                 
@@ -185,11 +200,11 @@
                     </span>
                   </td>
                   <td>
-                    <a target="_blank" href="fullPost.php?id=<?php echo $row['id'] ?>"  class="btn btn-sm btn-info">live preview</a>
+                    <a target="_blank" href="fullPost.php?id=<?php echo $post->id ?>"  class="btn btn-sm btn-info">live preview</a>
                   </td>
                 </tr>
 
-              <?php endforeach; ?> 
+              <?php endforeach;} ?> 
                </table>
              </div>
           </div>

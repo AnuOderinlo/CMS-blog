@@ -1,79 +1,135 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<?php 
+  // require_once 'include/session.php';
+  // require_once 'include/functions.php';
+  // require_once 'include/config.php';
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ require 'template/header.php';
+  $post = new Post();
 
-    <title>CMS|project</title>
-  </head>
-  <body>
-    <header class="container-fluid bg-dark">
-      <nav class="navbar navbar-dark navbar-expand-md container ">
-        <!-- Brand -->
-        <a class="navbar-brand" href="#">Logo</a>
-        
-        <button class="navbar-toggler  navbar-light" data-toggle="collapse" data-target="#collapsibleNavbar">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-   
+  $page = !empty($_GET['page'])? $_GET['page']: 1;
+  $items_per_page = 4;
+  $total_items = Post::count_all(); 
 
-        <!-- Navbar links -->
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul class="navbar-nav text-white mr-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="profile.php">My profile</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="dasboard.php">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="post.php">Posts</a>
-            </li> 
-            <li class="nav-item">
-              <a class="nav-link" href="category.php">Categories</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="admin.php">Manage Admins</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="comment.php">Comments</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="blog.php">Live Blog</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a href="#" class="nav-link text-white">Logout</a>
-            </li>
-          </ul>
+  $paginate = new Paginate($page, $items_per_page, $total_items );
+  $sql = "SELECT * FROM posts ORDER BY id desc LIMIT {$items_per_page} OFFSET {$paginate->offset()}";
+  $posts = Post::find_this_query($sql);
+  
+  
+
+
+ ?>
+
+    <!-- Main Content -->
+    <section class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <!-- <h1>The complete Responsive CMS blog</h1> -->
+          <!-- <h1 class="lead">The complete Blog by using PHP by Anuoluwapo Oderinlo</h1> -->
+          <?php 
+             /* echo errorMessage(); 
+              echo successMessage(); */
+          ?>
+          <?php 
+            // search query
+            if (isset($_GET['submit'])) {
+              $searchInput = "%".$_GET['search']."%";
+              $posts=$post->post_by_search($searchInput);
+              
+            /* category query;*/
+            }elseif (isset($_GET['category'])) {
+              $category = $_GET['category'];
+              $posts=$post->post_by_category($category);
+              if (!$posts) {
+                Redirect("blog.php");
+              }
+            }
+            /*default sql*/
+            else{
+              
+              
+              // $result= $post->post_by_default();
+              // Redirect('blog.php?page=1');
+            }
+             // $results=$post->post_by_default();
+             foreach ($posts as $post) :
+                // $post->image = $result->image;
+              // var_dump($result);
+
+                // echo $result->post;
+
+            // while ($row = $result->fetch_assoc()) {
+            //   $id = $row["id"];
+            //   $title = htmlentities($row['title']);
+            //   $date = htmlentities($row['date']);
+            //   $author = htmlentities($row['author']);
+            //   $post = htmlentities($row['post']);
+            //   $image = htmlentities($row['image']);
+          ?>
+          <div class="card mb-1">
+            <img src="<?php echo $post->picture_path();?>" class="img-fluid card-img-top" style="max-height: 350px">
+            <div class="card-body">
+              <h2 class="card-title"><?php echo $post->title ?></h2>
+              <small class="text-muted" >Written by <a href="profile.php?author=<?php echo base64_encode($post->author) ?>"><?php echo $post->author; ?></a> <?php echo " on ".$post->date; ?></small>
+              <!-- <span class="badge badge-info" style="float: right">comment <?php ($id) ?></span> -->
+              <hr>
+              <p class="card-text">
+                <?php 
+                  if (strlen($post->post) > 120) {
+                    
+                    echo substr($post->post, 0, 119)."..." ;
+                  }else{
+                    echo $post->post;
+                  }
+
+               ?>
+                  
+              </p>
+              <a href="fullPost.php?id=<?php echo $post->id ?>"target="_blank" style="float: right;" class="btn btn-primary">read more</a>
+            </div>
+          </div>
+        <?php 
+          endforeach;
+        ?>
+          <!-- pagination -->
+          <nav class="mt-5">
+            <ul class="pagination pagination-md">
+              <?php 
+                if ($paginate->total_page() > 1) {
+                  if ($paginate->has_previous()) {
+                    echo "<li class='page-item'><a class='page-link' href='blog.php?page={$paginate->previous()}'><<</a> </li>" ;
+                  }
+                
+                  for ($i=1; $i <= $paginate->total_page() ; $i++) { 
+                    if ($i == $page) {
+                      echo "<li class='page-item active'><a class='page-link' href='blog.php?page=$i''>$i</a></li>";
+                    }else{
+                      echo "<li class='page-item'><a class='page-link' href='blog.php?page=$i''>$i</a></li>";
+
+                    }
+                  }
+                  if ($paginate->has_next()) {
+                    echo "<li class='next'><a class='page-link' href='blog.php?page={$paginate->next()}'>>></a> </li>" ;
+                  }
+
+                  
+                  
+                }
+               ?>
+
+
+             <!--  -->
+
+            </ul>
+          </nav>
         </div>
-        
 
-        <!-- <div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
-          <ul class="navbar-nav text-dark">
-            <li class="nav-item">
-              <a class="nav-link" href="#"><span class=" fa fa-cart-arrow-down"></span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Your Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Join as a maker</a>
-            </li> 
-          </ul>
-        </div>  -->
-        
-      </nav>
-      
-    </header>
-    <h1>Main Content</h1>
+        <!-- sidebar starts here -->
+        <?php require 'template/sidebar.php'; ?>
+      </div>
+
+
+    </section>
+
     <?php require 'template/footer.php'; ?>
     
   </body>

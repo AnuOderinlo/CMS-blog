@@ -37,14 +37,29 @@
 
 		public static function verify_user($username,$password){
 			global $database;
-			$username = $database->escape_string($username);
 
-			$sql= "SELECT * FROM ".self::$db_table ." WHERE (username='$username' OR email='$username') AND password='$password' LIMIT 1";
+			$sql= "SELECT * FROM ".self::$db_table ." WHERE (username='$username' OR email='$username') AND activation='active' LIMIT 1";
+			$result_array = self::find_this_query($sql);
+			foreach ($result_array as $row) {
+				 $hassPassword = $row->password;
+			}
+
+			if (password_verify($password, $hassPassword)) {
+				return !empty($result_array) ? array_shift($result_array) :  false;
+			}
+
+		}
+
+		public static function verify_email($vkey){
+			global $database;
+
+			$sql= "SELECT * FROM ".self::$db_table ." WHERE activation= 'invalid' AND code='$vkey' LIMIT 1";
 			$result_array = self::find_this_query($sql);
 
 			return !empty($result_array) ? array_shift($result_array) :  false;
 		}
 
+		
 
 		public function delete_user_dp(){
 			if ($this->delete()) {
@@ -135,16 +150,17 @@
 
 
 		/*This functions checks the existence of a username*/
-		public function checkUsername($username){
+		public function check_username($username){
 			global $database;
 			$sql = "SELECT username FROM  ".self::$db_table." WHERE username='$username'";
 			$connect = $database->query($sql);
 
 			$totalRow = mysqli_num_rows($connect);
 			if ($totalRow == 1) {
-				return true;
+				// return true;
+				echo "Username already exist";
 			}else{
-				return false;
+				return $username;
 			}
 		}
 
@@ -156,6 +172,23 @@
 			$connect = $database->query($sql);
 
 			$totalRow = mysqli_num_rows($connect);
+			if ($totalRow == 1) {
+				echo "Email already exist";
+			}else{
+				return $email;
+			}
+		}
+		
+			/*This functions checks if an email exist*/
+		public function if_email_exist($email){
+			global $database;
+			$sql = "SELECT email FROM  ".self::$db_table." WHERE email=?";
+	    $stmt = $database->prepare($sql);
+	    $stmt->bind_param("s", $email);
+	    $stmt->execute();
+	    $result = $stmt->get_result();
+
+			$totalRow = $result->num_rows;
 			if ($totalRow == 1) {
 				return true;
 			}else{
@@ -219,20 +252,17 @@
 		}
 
 
-		public  function register_user($data){
+		public  function register_user($data, $vkey){
 			global $database;
 
-			$sql ="INSERT INTO ".static::$db_table." (date, username, adminName, email, password, activation) VALUES (?,?,?,?,?,?)";
+			$sql ="INSERT INTO ".static::$db_table." (date, username, adminName, email, password, code) VALUES (?,?,?,?,?,?)";
 			$connect = $database->prepare($sql);
-			$connect->bind_param("ssssss", $data['date'], $data['username'], $data['name'], $data['email'], $data['password'], "inactive");
+			$connect->bind_param("ssssss", $data['date'], $data['username'], $data['fullname'], $data['email'], $data['password'], $vkey);
 			if ($connect->execute()) {
 				return true;
 			}
 		}
 		
-
-
-
 
 
 		public function search_admin($search_input){
@@ -241,6 +271,19 @@
 			$result = self::find_this_query($sql);
 			return !empty($result) ? $result :  false;
 			
+		}
+
+
+
+		/*Update the password in Admin table for password reset*/
+		public function update_password($password, $email){
+			global $database;
+			$sql = "UPDATE ". self::$db_table." SET password=? WHERE email=?";
+			$stmt = $database->prepare($sql);
+			$stmt->bind_param("ss", $password, $email);
+			if ($stmt->execute()) {
+				return true;
+			}
 		}
 
 		

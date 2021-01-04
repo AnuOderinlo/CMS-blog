@@ -2,17 +2,19 @@
 
 
 	class Password extends Db_object{
-		public $db_table = "admins";
+		protected static $db_table = 'admins';
 		public function __construct(){
 			
 		}
 
 		public function change_password($email){
 			global $database;
-			$sql = "SELECT * from ".$this->db_table ." WHERE email='$email'";
+			$sql = "SELECT email FROM  ".self::$db_table." WHERE email='$email'";
 			$result = self::find_this_query($sql);
 			if ($result) {
-				$token_code = substr(md5(uniqid()),0,5);
+
+
+				/*$token_code = substr(md5(uniqid()),0,5);
 				$receiver = $email;
 				$subject = "Reset Password";
 				$message =  <<<email
@@ -26,27 +28,41 @@
 
 				          email;
 				$sender = "From: oderinloanuoluwapo@gmail.com";
-				mail($receiver, $subject, $message);
+				mail($receiver, $subject, $message);*/
 
-
-				$_SESSION["successMessage"] = "Please check your Email for new password";
-				Redirect('forget_password.php');
+				return true;
+				
 			}else{
-
+				return false;
+				// $session->set_error_message("Email doesn't exist");
+				// return "Email doesn't exist";
 			}
 
 		}
 
-		public function update_password(){
-			
+
+		/*Delete the record where activation_ code is active from password_recovery table*/
+		public function delete_password_token($token){
+			global $database;
+			$sql = "DELETE FROM password_recovery WHERE activation_code=?";
+			$stmt = $database->prepare($sql);
+			$stmt->bind_param("s", $token);
+			if ($stmt->execute()) {
+				return true;
+			}
 		}
 
 		public function password_hashing($password){
-			
+			$passwordHash = password_hash($password, PASSWORD_DEFAULT);
+			return $passwordHash;
 		}
 
 
 	}
+
+
+
+	$password = new Password();
 
 
 

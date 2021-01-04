@@ -41,8 +41,8 @@
     }
     }
     else{
-       unset($_SESSION['token']);
-       unset($_SESSION['token_time']);
+      unset($_SESSION['token']);
+      unset($_SESSION['token_time']);
       $error = "Please you need to refresh the page <a href=''>Refresh</a>";
     }
 

@@ -1,5 +1,9 @@
 <?php 
   require_once "classes/init.php";
+
+  $filename = basename($_SERVER["PHP_SELF"]);
+  $filenameArray = explode(".",$filename);
+
  ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,14 +19,14 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
 
-    <title>Blog</title>
+    <title><?php echo ucfirst($filenameArray[0])  ?></title>
   </head>
   <body>
 
     <header class="container-fluid bg-dark mb-3">
       <nav class="navbar navbar-dark navbar-expand-md ">
         <!-- Brand -->
-        <a class="navbar-brand" href="blog.php">i<i class="font-weight-bold" style="color: red">Blog.com</i></a>
+        <a class="navbar-brand" href="index.php">i<i class="font-weight-bold" style="color: red">Blog.com</i></a>
         
         <button class="navbar-toggler  navbar-light" data-toggle="collapse" data-target="#collapsibleNavbar">
           <span class="navbar-toggler-icon"></span>
@@ -32,7 +36,7 @@
         <div class="collapse navbar-collapse justify-content-between" id="collapsibleNavbar">
           <ul class="navbar-nav text-white">
             <li class="nav-item">
-              <a class="nav-link" href="blog.php">Home</a>
+              <a class="nav-link" href="index.php">Home</a>
             </li>
             <li class="nav-item"> 
               <a class="nav-link" href="#">About us</a>

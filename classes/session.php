@@ -103,7 +103,7 @@ class Session{
 
 	public	function success_message(){
 		if (isset($_SESSION["success_message"])) {
-			$output ='<div id="error" class="alert alert-success">'.$this->message.'</div>';
+			$output ='<div id="error" class="alert alert-success">'.$this->message.'<button type="button" class="close" data-dismiss="modal">&times;</button></div>';
 			unset($_SESSION['success_message']);
 			return $output;
 		}
