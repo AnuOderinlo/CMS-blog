@@ -15,17 +15,13 @@ if (isset($_POST["submit"])) {
     $commentEmail = $validator->sanitize_string($_POST["commentEmail"]);
     $commentText = $validator->sanitize_string($_POST['commentText']);
     if (empty($commentName) || empty($commentEmail) || empty($commentText)  ) {
-      // $session->message("Field can't be empty");
-      // echo $message;
-      // $session->set_error_message("Field can't be empty");
-      // echo $session->error_message();
       echo "Field can't be empty";
     
     }elseif (strlen($commentText) > 499) {
       // $session->message("Maximum characters reach(500 characters)");
       echo "Maximum characters reach(500 characters)";
       // echo $message;
-    }elseif (!$validator->form_validator($commentEmail)) {
+    }elseif (!$validator->email_validator($commentEmail)) {
       // $session->message("Invalid Email");
       echo "Invalid Email";
       // echo $message;

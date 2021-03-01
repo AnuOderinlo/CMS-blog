@@ -12,6 +12,7 @@
     Redirect("register.php");
   }
 
+  /*GETS EMAIL, ACTIVATION_CODE AND VERIFICATION TIME FRO THE PASSWOR RECOVERY TABLE IN THE DATABASE*/
   $sql = "SELECT email, activation_code, verification_time FROM password_recovery WHERE activation_code=?";
   $stmt = $database->prepare($sql);
   $stmt->bind_param("s", $token);
@@ -30,24 +31,30 @@
     $confirm_password = $validator->sanitize_string($_POST['confirm_password']);
 
     if (time() < $expiryTime && $token === $tokenDB) {
+      if (!empty($new_password)) {
+        if ($new_password === $confirm_password) {
 
-      if ($new_password === $confirm_password) {
+          $password = $password->password_hashing($new_password);
 
-        $password = $password->password_hashing($new_password);
+          /*Update the password in Admin table*/
+          $user->update_password($password, $email);
 
-        /*Update the password in Admin table*/
-        $user->update_password($password, $email);
-
-        /*Delete the record where activation_ code is active from password_recovery table*/
-        $password->delete_password_token($token);
+          /*Delete the record where activation_ code is active from password_recovery table*/
+          $password->delete_password_token($token);
 
 
-        $session->set_success_message("Password successfully changed");
-        Redirect('login.php');
+          $session->set_success_message("Password successfully changed");
+          Redirect('login.php');
+        }else{
+          $session->set_error_message("Password(s) doesn't match");
+          Redirect('restore_password.php?token='.$token);
+        }
       }else{
-        $session->set_error_message("Password(s) doesn't match");
+        $session->set_error_message("Password(s) can't be empty");
         Redirect('restore_password.php?token='.$token);
       }
+
+      
 
     }else{
      /*Delete the record where activation_ code is active from password_recovery table*/
