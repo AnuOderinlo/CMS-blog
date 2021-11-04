@@ -44,9 +44,9 @@
 				 $hassPassword = $row->password;
 			}
 
-			if (password_verify($password, $hassPassword)) {
+			// if (password_verify($password, $hassPassword)) {
 				return !empty($result_array) ? array_shift($result_array) :  false;
-			}
+			// }
 
 		}
 

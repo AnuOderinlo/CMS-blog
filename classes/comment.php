@@ -1,8 +1,6 @@
 <?php 
 
 
-
-
 	class Comment extends Db_object{
 
 
@@ -21,8 +19,6 @@
 				$connect = $database->prepare($sql);
 				$connect->bind_param("issss", $post_id, $date, $name, $email, $comment);
 				$connect = $connect->execute();
-				var_dump($connect);
-
 				return $connect;
 		}
 

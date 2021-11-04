@@ -38,10 +38,12 @@
           
           <?php 
             $comments = $comment->find_comments();
+            // $comments = Comment::find_all();
             $sn = 0;
             foreach ($comments as $comment):
               $sn++;
           ?>
+
           <?php 
             $post = $post->find_by_id($comment->post_id);
 
@@ -53,16 +55,16 @@
             <td><?php echo $comment->name ?></td>
             <td><?php echo $comment->comment?></td>
             <td><?php echo $post->title; ?></td>
-            <!-- <td><a href="unapproveComment.php?id=<?php echo $comment->id ?>" class="btn btn-sm btn-warning"><i class="fas fa-thumbs-down"></i></a></td> -->
+            
             <td>
               <a href="#myModal" class="btn btn-sm btn-danger delete_link" data-id="<?php echo $comment->id ?>" data-toggle="modal">Delete <i class=" far fa-trash-alt"></i></a>
-              <!-- <a href="#myModal" class="text-white btn btn-sm btn-danger">Delete <i class=" far fa-trash-alt"></i></a> -->
-              <!-- <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button> -->
+              
             </td>
             <td>
-              <a target="_blank" href="fullpost.php?id=<?php echo $comment->post_id ?>"  class="btn btn-sm btn-info">live preview</a>
+              <a target="_blank" href="fullPost.php?id=<?php echo $comment->post_id ?>"  class="btn btn-sm btn-info">live preview</a>
             </td>
           </tr>
+          <?php endforeach;  ?> 
 
           <!-- Modal -->
           <div id="myModal" class="modal fade" role="dialog">
@@ -85,7 +87,7 @@
             </div>
           </div>
 
-        <?php endforeach;  ?> 
+        
         </table>
       </div>
     </section>
@@ -99,7 +101,7 @@
         $(".delete_link").click(function () {
           var id = $(this).attr("data-id");
           var value = "deleteComment.php?id=<?php ?>" + id
-          $(".comment_id").attr("href", value)
+          $(".comment_id").attr("href", value);
             
 
         })
